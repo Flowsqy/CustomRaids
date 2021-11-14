@@ -1,0 +1,4 @@
+name: CustomRaids
+author: Flowsqy
+version: "${project.version}"
+main: fr.flowsqy.customraids.CustomRaidsPlugin

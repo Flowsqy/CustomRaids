@@ -55,6 +55,10 @@ public class RaidsDeserializer implements EventDeserializer {
                     raidEntities.add(builder);
                 }
             }
+            if (raidEntities.isEmpty()) {
+                logger.warning("No entity for the raids in " + fileName);
+                return null;
+            }
 
 
             // Rewards
@@ -94,7 +98,15 @@ public class RaidsDeserializer implements EventDeserializer {
             final String endMessage = getMessage(messageSection, "end");
             final String processingMessage = getMessage(messageSection, "processing");
 
-            return null; // TODO Create the event and initialize it with the data above
+            return new RaidsEvent(
+                    worldName,
+                    worldAlias,
+                    raidEntities,
+                    rewards,
+                    startMessage,
+                    endMessage,
+                    processingMessage
+            );
         } else {
             logger.warning("Can not get the AbstractMob instance");
             return null;

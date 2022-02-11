@@ -17,13 +17,14 @@ public class RaidsEvent implements Event {
     private final String endMessage;
     private final String processingMessage;
 
-    public RaidsEvent(String worldName,
-                      String worldAlias,
-                      List<EntityBuilder> raidEntities,
-                      Map<ItemBuilder, List<Integer>> rewards,
-                      String startMessage,
-                      String endMessage,
-                      String processingMessage
+    public RaidsEvent(
+            String worldName,
+            String worldAlias,
+            List<EntityBuilder> raidEntities,
+            Map<ItemBuilder, List<Integer>> rewards,
+            String startMessage,
+            String endMessage,
+            String processingMessage
     ) {
         this.worldName = worldName;
         this.worldAlias = worldAlias;

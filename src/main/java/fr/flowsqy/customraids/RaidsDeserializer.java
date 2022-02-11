@@ -19,6 +19,12 @@ import java.util.logging.Logger;
 
 public class RaidsDeserializer implements EventDeserializer {
 
+    private final CustomRaidsPlugin plugin;
+
+    public RaidsDeserializer(CustomRaidsPlugin plugin) {
+        this.plugin = plugin;
+    }
+
     @Override
     public Event deserialize(ConfigurationSection section, Logger logger, String fileName) {
         // Get AbstractMob instance
@@ -36,6 +42,11 @@ public class RaidsDeserializer implements EventDeserializer {
                 return null;
             }
             final String worldAlias = getMessage(worldSection, "alias");
+            final int spawnRadius = worldSection.getInt("radius", -1);
+            if (spawnRadius < 0) {
+                logger.warning("Invalid radius (< 0) in " + fileName);
+                return null;
+            }
 
 
             // Entities
@@ -96,16 +107,17 @@ public class RaidsDeserializer implements EventDeserializer {
             }
             final String startMessage = getMessage(messageSection, "start");
             final String endMessage = getMessage(messageSection, "end");
-            final String processingMessage = getMessage(messageSection, "processing");
 
             return new RaidsEvent(
+                    plugin,
+                    abstractMobPlugin,
                     worldName,
                     worldAlias,
+                    spawnRadius,
                     raidEntities,
                     rewards,
                     startMessage,
-                    endMessage,
-                    processingMessage
+                    endMessage
             );
         } else {
             logger.warning("Can not get the AbstractMob instance");

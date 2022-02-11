@@ -14,7 +14,7 @@ public class CustomRaidsPlugin extends JavaPlugin {
         if (rawCustomEventsPlugin instanceof CustomEventsPlugin customEventsPlugin) {
             customEventsPlugin.getEventManager().register(
                     "raids",
-                    new RaidsDeserializer(),
+                    new RaidsDeserializer(this),
                     false
             );
         } else {

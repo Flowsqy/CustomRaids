@@ -38,11 +38,13 @@
             <groupId>com.github.Flowsqy</groupId>
             <artifactId>CustomEvents</artifactId>
             <version>110142f25b</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>com.github.Flowsqy</groupId>
             <artifactId>AbstractMob</artifactId>
             <version>88a4b7f29f</version>
+            <scope>provided</scope>
         </dependency>
     </dependencies>
 

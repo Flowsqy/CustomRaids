@@ -59,15 +59,13 @@ public class RaidsEvent implements Event, Listener {
 
         this.aliveEntities = new HashSet<>();
 
-        Bukkit.getPluginManager().registerEvents(this, customRaidsPlugin);
+        customRaidsPlugin.setEvent(this);
     }
 
     @Override
     public void perform() {
         // End previous event
-        for (Entity entity : aliveEntities) {
-            entity.remove();
-        }
+        killPreviousEntities();
 
         // Start the new one
         final World world = Bukkit.getWorld(worldName);
@@ -128,6 +126,12 @@ public class RaidsEvent implements Event, Listener {
                     }
                 }
             }
+        }
+    }
+
+    public void killPreviousEntities() {
+        for (Entity entity : aliveEntities) {
+            entity.remove();
         }
     }
 

@@ -7,6 +7,8 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 public class CustomRaidsPlugin extends JavaPlugin {
 
+    private RaidsEvent event;
+
     @Override
     public void onLoad() {
         // Hook to CustomEvents
@@ -22,6 +24,23 @@ public class CustomRaidsPlugin extends JavaPlugin {
             getLogger().warning("Disable the plugin");
             Bukkit.getPluginManager().disablePlugin(this);
         }
+    }
+
+    @Override
+    public void onEnable() {
+        Bukkit.getPluginManager().registerEvents(event, this);
+    }
+
+    @Override
+    public void onDisable() {
+        event.killPreviousEntities();
+    }
+
+    public void setEvent(RaidsEvent event) {
+        if (this.event != null) {
+            throw new IllegalStateException("Can not set the event. It's already set");
+        }
+        this.event = event;
     }
 
 }

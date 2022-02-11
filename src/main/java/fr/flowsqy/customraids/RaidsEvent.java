@@ -108,7 +108,7 @@ public class RaidsEvent implements Event, Listener {
                 final World world = Objects.requireNonNull(spawnLocation.getWorld());
                 final Block rewardChest = world.getHighestBlockAt(spawnLocation).getRelative(BlockFace.UP);
                 rewardChest.setType(Material.CHEST);
-                final Chest chest = (Chest) rewardChest.getBlockData();
+                final Chest chest = (Chest) rewardChest.getState();
                 final Inventory inventory = chest.getBlockInventory();
                 for (Map.Entry<ItemBuilder, List<Integer>> entry : rewards.entrySet()) {
                     final ItemStack itemStack = entry.getKey().create(null);

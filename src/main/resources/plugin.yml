@@ -2,3 +2,7 @@ name: CustomRaids
 author: Flowsqy
 version: "${project.version}"
 main: fr.flowsqy.customraids.CustomRaidsPlugin
+api-version: "1.13"
+depend:
+  - CustomEvents
+  - AbstractMob

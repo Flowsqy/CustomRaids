@@ -21,14 +21,28 @@
             <id>spigot</id>
             <url>https://hub.spigotmc.org/nexus/content/repositories/snapshots/</url>
         </repository>
+        <repository>
+            <id>jitpack.io</id>
+            <url>https://jitpack.io</url>
+        </repository>
     </repositories>
 
     <dependencies>
         <dependency>
             <groupId>org.spigotmc</groupId>
             <artifactId>spigot-api</artifactId>
-            <version>1.17.1-R0.1-SNAPSHOT</version>
+            <version>1.18.1-R0.1-SNAPSHOT</version>
             <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.github.Flowsqy</groupId>
+            <artifactId>CustomEvents</artifactId>
+            <version>110142f25b</version>
+        </dependency>
+        <dependency>
+            <groupId>com.github.Flowsqy</groupId>
+            <artifactId>AbstractMob</artifactId>
+            <version>88a4b7f29f</version>
         </dependency>
     </dependencies>
 

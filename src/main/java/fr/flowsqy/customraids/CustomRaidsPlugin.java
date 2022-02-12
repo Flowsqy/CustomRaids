@@ -36,6 +36,11 @@ public class CustomRaidsPlugin extends JavaPlugin {
         event.killPreviousEntities();
     }
 
+    /**
+     * Register the event in the plugin instance
+     *
+     * @param event The {@link RaidsEvent} that will be used by the CustomEvent plugin
+     */
     public void setEvent(RaidsEvent event) {
         if (this.event != null) {
             throw new IllegalStateException("Can not set the event. It's already set");

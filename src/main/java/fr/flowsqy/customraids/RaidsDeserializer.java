@@ -110,14 +110,16 @@ public class RaidsDeserializer implements EventDeserializer {
 
             return new RaidsEvent(
                     plugin,
-                    abstractMobPlugin,
-                    worldName,
-                    worldAlias,
-                    spawnRadius,
-                    raidEntities,
-                    rewards,
-                    startMessage,
-                    endMessage
+                    new RaidsData(
+                            abstractMobPlugin,
+                            worldName,
+                            worldAlias,
+                            spawnRadius,
+                            raidEntities,
+                            rewards,
+                            startMessage,
+                            endMessage
+                    )
             );
         } else {
             logger.warning("Can not get the AbstractMob instance");
@@ -125,6 +127,13 @@ public class RaidsDeserializer implements EventDeserializer {
         }
     }
 
+    /**
+     * Deserialize a message and set the color
+     *
+     * @param messageSection The message section
+     * @param path           The path of the message
+     * @return the message stored in the configuration with colors, null if it does not exist
+     */
     private String getMessage(ConfigurationSection messageSection, String path) {
         final String message = messageSection.getString(path);
         return message == null ? null : ChatColor.translateAlternateColorCodes('&', message);

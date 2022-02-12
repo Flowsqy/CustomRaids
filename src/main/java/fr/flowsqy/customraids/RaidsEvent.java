@@ -1,7 +1,6 @@
 package fr.flowsqy.customraids;
 
 import fr.flowsqy.abstractmenu.item.ItemBuilder;
-import fr.flowsqy.abstractmob.AbstractMobPlugin;
 import fr.flowsqy.abstractmob.entity.EntityBuilder;
 import fr.flowsqy.customevents.api.Event;
 import org.bukkit.Bukkit;
@@ -25,40 +24,20 @@ import java.util.*;
 
 public class RaidsEvent implements Event, Listener {
 
-    private final AbstractMobPlugin abstractMobPlugin;
-    private final String worldName;
-    private final String worldAlias;
-    private final int spawnRadius;
-    private final List<EntityBuilder> raidEntities;
-    private final Map<ItemBuilder, List<Integer>> rewards;
-    private final String startMessage;
-    private final String endMessage;
+    private final RaidsData raidsData;
 
     private final Set<Entity> aliveEntities;
     private Location spawnLocation;
 
-    public RaidsEvent(
-            CustomRaidsPlugin customRaidsPlugin,
-            AbstractMobPlugin abstractMobPlugin,
-            String worldName,
-            String worldAlias,
-            int spawnRadius,
-            List<EntityBuilder> raidEntities,
-            Map<ItemBuilder, List<Integer>> rewards,
-            String startMessage,
-            String endMessage
-    ) {
-        this.abstractMobPlugin = abstractMobPlugin;
-        this.worldName = worldName;
-        this.worldAlias = worldAlias;
-        this.spawnRadius = spawnRadius;
-        this.raidEntities = raidEntities;
-        this.rewards = rewards;
-        this.startMessage = startMessage;
-        this.endMessage = endMessage;
-
+    /**
+     * Create a raid event
+     *
+     * @param customRaidsPlugin The {@link CustomRaidsPlugin} instance to register the created event
+     * @param raidsData         The parameters of the event
+     */
+    RaidsEvent(CustomRaidsPlugin customRaidsPlugin, RaidsData raidsData) {
+        this.raidsData = raidsData;
         this.aliveEntities = new HashSet<>();
-
         customRaidsPlugin.setEvent(this);
     }
 
@@ -68,20 +47,26 @@ public class RaidsEvent implements Event, Listener {
         killPreviousEntities();
 
         // Start the new one
-        final World world = Bukkit.getWorld(worldName);
+        final World world = Bukkit.getWorld(raidsData.worldName());
         if (world == null) {
             return;
         }
 
+        // Select location
         final Random random = new Random();
-        final int doubledRadius = spawnRadius * 2;
-        final Vector vector = new Vector(random.nextInt(doubledRadius) - spawnRadius, 0, random.nextInt(doubledRadius) - spawnRadius);
-        vector.normalize().multiply((double) spawnRadius * random.nextDouble());
+        final int doubledRadius = raidsData.spawnRadius() * 2;
+        final Vector vector = new Vector(
+                random.nextInt(doubledRadius) - raidsData.spawnRadius(),
+                0,
+                random.nextInt(doubledRadius) - raidsData.spawnRadius()
+        );
+        vector.normalize().multiply((double) raidsData.spawnRadius() * random.nextDouble());
         spawnLocation = new Location(world, 0, 0, 0).add(vector);
 
-        for (EntityBuilder entityBuilder : raidEntities) {
+        // Spawn and register entities
+        for (EntityBuilder entityBuilder : raidsData.raidEntities()) {
             final List<Entity> spawnedEntities = entityBuilder.spawn(
-                    abstractMobPlugin,
+                    raidsData.abstractMobPlugin(),
                     spawnLocation,
                     entityBuilder.getRadius(),
                     true
@@ -89,49 +74,59 @@ public class RaidsEvent implements Event, Listener {
             aliveEntities.addAll(spawnedEntities);
         }
 
-        if (startMessage != null) {
-            final String message = startMessage
-                    .replace("%world%", worldAlias)
-                    .replace("%x%", String.valueOf(spawnLocation.getBlockX()))
-                    .replace("%z%", String.valueOf(spawnLocation.getBlockZ()));
-            for (Player player : Bukkit.getOnlinePlayers()) {
-                player.sendMessage(message);
-            }
-        }
+        // Send start message
+        sendMessage(raidsData.startMessage());
     }
 
     @EventHandler(priority = EventPriority.MONITOR)
-    public void onDeath(EntityDeathEvent event) {
+    private void onDeath(EntityDeathEvent event) {
         if (aliveEntities.remove(event.getEntity())) {
             // Check if the event is finished
             if (aliveEntities.isEmpty()) {
+                // Set rewards
+                // Create the chest
                 final World world = Objects.requireNonNull(spawnLocation.getWorld());
                 final Block rewardChest = world.getHighestBlockAt(spawnLocation).getRelative(BlockFace.UP);
                 rewardChest.setType(Material.CHEST);
+
+                // Fill the chest with rewards
                 final Chest chest = (Chest) rewardChest.getState();
                 final Inventory inventory = chest.getBlockInventory();
-                for (Map.Entry<ItemBuilder, List<Integer>> entry : rewards.entrySet()) {
+                for (Map.Entry<ItemBuilder, List<Integer>> entry : raidsData.rewards().entrySet()) {
                     final ItemStack itemStack = entry.getKey().create(null);
                     for (int slot : entry.getValue()) {
                         inventory.setItem(slot, itemStack);
                     }
                 }
-                if (endMessage != null) {
-                    final String message = endMessage
-                            .replace("%world%", worldAlias)
-                            .replace("%x%", String.valueOf(spawnLocation.getBlockX()))
-                            .replace("%z%", String.valueOf(spawnLocation.getBlockZ()));
-                    for (Player player : Bukkit.getOnlinePlayers()) {
-                        player.sendMessage(message);
-                    }
-                }
+                // Send end message
+                sendMessage(raidsData.endMessage());
             }
         }
     }
 
+    /**
+     * Remove the entities from the previous event
+     */
     public void killPreviousEntities() {
         for (Entity entity : aliveEntities) {
             entity.remove();
+        }
+    }
+
+    /**
+     * Send a message to all players
+     *
+     * @param rawMessage The message with placeholders
+     */
+    private void sendMessage(String rawMessage) {
+        if (rawMessage != null) {
+            final String message = rawMessage
+                    .replace("%world%", raidsData.worldAlias())
+                    .replace("%x%", String.valueOf(spawnLocation.getBlockX()))
+                    .replace("%z%", String.valueOf(spawnLocation.getBlockZ()));
+            for (Player player : Bukkit.getOnlinePlayers()) {
+                player.sendMessage(message);
+            }
         }
     }
 

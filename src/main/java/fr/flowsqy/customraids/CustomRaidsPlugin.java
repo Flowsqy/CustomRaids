@@ -5,9 +5,16 @@ import org.bukkit.Bukkit;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import java.util.LinkedList;
+import java.util.List;
+
 public class CustomRaidsPlugin extends JavaPlugin {
 
-    private RaidsEvent event;
+    private final List<RaidsEvent> raidsEvents;
+
+    public CustomRaidsPlugin() {
+        this.raidsEvents = new LinkedList<>();
+    }
 
     @Override
     public void onLoad() {
@@ -16,7 +23,7 @@ public class CustomRaidsPlugin extends JavaPlugin {
         if (rawCustomEventsPlugin instanceof CustomEventsPlugin customEventsPlugin) {
             customEventsPlugin.getEventManager().register(
                     "raids",
-                    new RaidsDeserializer(this),
+                    new RaidsDeserializer(raidsEvents),
                     false
             );
         } else {
@@ -28,24 +35,16 @@ public class CustomRaidsPlugin extends JavaPlugin {
 
     @Override
     public void onEnable() {
-        Bukkit.getPluginManager().registerEvents(event, this);
+        for (RaidsEvent event : raidsEvents) {
+            Bukkit.getPluginManager().registerEvents(event, this);
+        }
     }
 
     @Override
     public void onDisable() {
-        event.killPreviousEntities();
-    }
-
-    /**
-     * Register the event in the plugin instance
-     *
-     * @param event The {@link RaidsEvent} that will be used by the CustomEvent plugin
-     */
-    public void setEvent(RaidsEvent event) {
-        if (this.event != null) {
-            throw new IllegalStateException("Can not set the event. It's already set");
+        for (RaidsEvent event : raidsEvents) {
+            event.killPreviousEntities();
         }
-        this.event = event;
     }
 
 }

@@ -32,13 +32,11 @@ public class RaidsEvent implements Event, Listener {
     /**
      * Create a raid event
      *
-     * @param customRaidsPlugin The {@link CustomRaidsPlugin} instance to register the created event
-     * @param raidsData         The parameters of the event
+     * @param raidsData The parameters of the event
      */
-    RaidsEvent(CustomRaidsPlugin customRaidsPlugin, RaidsData raidsData) {
+    RaidsEvent(RaidsData raidsData) {
         this.raidsData = raidsData;
         this.aliveEntities = new HashSet<>();
-        customRaidsPlugin.setEvent(this);
     }
 
     @Override

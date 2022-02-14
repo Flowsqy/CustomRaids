@@ -19,10 +19,10 @@ import java.util.logging.Logger;
 
 public class RaidsDeserializer implements EventDeserializer {
 
-    private final CustomRaidsPlugin plugin;
+    private final List<RaidsEvent> raidsEvents;
 
-    public RaidsDeserializer(CustomRaidsPlugin plugin) {
-        this.plugin = plugin;
+    public RaidsDeserializer(List<RaidsEvent> raidsEvents) {
+        this.raidsEvents = raidsEvents;
     }
 
     @Override
@@ -108,8 +108,7 @@ public class RaidsDeserializer implements EventDeserializer {
             final String startMessage = getMessage(messageSection, "start");
             final String endMessage = getMessage(messageSection, "end");
 
-            return new RaidsEvent(
-                    plugin,
+            final RaidsEvent event = new RaidsEvent(
                     new RaidsData(
                             abstractMobPlugin,
                             worldName,
@@ -121,6 +120,8 @@ public class RaidsDeserializer implements EventDeserializer {
                             endMessage
                     )
             );
+            raidsEvents.add(event);
+            return event;
         } else {
             logger.warning("Can not get the AbstractMob instance");
             return null;

@@ -17,7 +17,7 @@ public class CustomRaidsPlugin extends JavaPlugin {
     }
 
     @Override
-    public void onLoad() {
+    public void onEnable() {
         // Hook to CustomEvents
         final Plugin rawCustomEventsPlugin = Bukkit.getPluginManager().getPlugin("CustomEvents");
         if (rawCustomEventsPlugin instanceof CustomEventsPlugin customEventsPlugin) {
@@ -31,10 +31,7 @@ public class CustomRaidsPlugin extends JavaPlugin {
             getLogger().warning("Disable the plugin");
             Bukkit.getPluginManager().disablePlugin(this);
         }
-    }
 
-    @Override
-    public void onEnable() {
         for (RaidsEvent event : raidsEvents) {
             Bukkit.getPluginManager().registerEvents(event, this);
         }

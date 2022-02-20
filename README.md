@@ -67,6 +67,9 @@ date:
 
 type: raids
 
+data:
+  command-id: "easy-raid"
+
 event:
   world:
     name: world

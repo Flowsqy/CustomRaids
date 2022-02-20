@@ -20,9 +20,11 @@ import java.util.logging.Logger;
 
 public class RaidsDeserializer implements EventDeserializer {
 
+    private final CustomRaidsPlugin customRaidsPlugin;
     private final List<RaidsEvent> raidsEvents;
 
-    public RaidsDeserializer(List<RaidsEvent> raidsEvents) {
+    public RaidsDeserializer(CustomRaidsPlugin customRaidsPlugin, List<RaidsEvent> raidsEvents) {
+        this.customRaidsPlugin = customRaidsPlugin;
         this.raidsEvents = raidsEvents;
     }
 
@@ -122,6 +124,7 @@ public class RaidsDeserializer implements EventDeserializer {
                             endMessage
                     )
             );
+            Bukkit.getPluginManager().registerEvents(event, customRaidsPlugin);
             raidsEvents.add(event);
             return event;
         } else {

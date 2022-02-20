@@ -23,17 +23,13 @@ public class CustomRaidsPlugin extends JavaPlugin {
         if (rawCustomEventsPlugin instanceof CustomEventsPlugin customEventsPlugin) {
             customEventsPlugin.getEventManager().register(
                     "raids",
-                    new RaidsDeserializer(raidsEvents),
+                    new RaidsDeserializer(this, raidsEvents),
                     false
             );
         } else {
             getLogger().warning("Can not hook to CustomEvents plugin");
             getLogger().warning("Disable the plugin");
             Bukkit.getPluginManager().disablePlugin(this);
-        }
-
-        for (RaidsEvent event : raidsEvents) {
-            Bukkit.getPluginManager().registerEvents(event, this);
         }
     }
 

@@ -118,6 +118,7 @@ public class RaidsEvent implements Event, Listener {
         for (Entity entity : aliveEntities) {
             entity.remove();
         }
+        aliveEntities.clear();
     }
 
     /**

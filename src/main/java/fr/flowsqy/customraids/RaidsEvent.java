@@ -3,6 +3,7 @@ package fr.flowsqy.customraids;
 import fr.flowsqy.abstractmenu.item.ItemBuilder;
 import fr.flowsqy.abstractmob.entity.EntityBuilder;
 import fr.flowsqy.customevents.api.Event;
+import fr.flowsqy.customevents.api.EventData;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -24,6 +25,7 @@ import java.util.*;
 
 public class RaidsEvent implements Event, Listener {
 
+    private final EventData eventData;
     private final RaidsData raidsData;
 
     private final Set<Entity> aliveEntities;
@@ -32,9 +34,11 @@ public class RaidsEvent implements Event, Listener {
     /**
      * Create a raid event
      *
-     * @param raidsData The parameters of the event
+     * @param eventData The generic parameters of the event
+     * @param raidsData The specific parameters of the event
      */
-    RaidsEvent(RaidsData raidsData) {
+    RaidsEvent(EventData eventData, RaidsData raidsData) {
+        this.eventData = eventData;
         this.raidsData = raidsData;
         this.aliveEntities = new HashSet<>();
     }
@@ -74,6 +78,11 @@ public class RaidsEvent implements Event, Listener {
 
         // Send start message
         sendMessage(raidsData.startMessage());
+    }
+
+    @Override
+    public EventData getData() {
+        return eventData;
     }
 
     @EventHandler(priority = EventPriority.MONITOR)

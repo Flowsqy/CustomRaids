@@ -5,6 +5,7 @@ import fr.flowsqy.abstractmob.AbstractMobPlugin;
 import fr.flowsqy.abstractmob.entity.EntityBuilder;
 import fr.flowsqy.abstractmob.entity.EntityBuilderSerializer;
 import fr.flowsqy.customevents.api.Event;
+import fr.flowsqy.customevents.api.EventData;
 import fr.flowsqy.customevents.api.EventDeserializer;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Bukkit;
@@ -26,7 +27,7 @@ public class RaidsDeserializer implements EventDeserializer {
     }
 
     @Override
-    public Event deserialize(ConfigurationSection section, Logger logger, String fileName) {
+    public Event deserialize(ConfigurationSection section, Logger logger, String fileName, EventData eventData) {
         // Get AbstractMob instance
         final Plugin rawAbstractMobPlugin = Bukkit.getPluginManager().getPlugin("AbstractMob");
         if (rawAbstractMobPlugin instanceof AbstractMobPlugin abstractMobPlugin) {
@@ -109,6 +110,7 @@ public class RaidsDeserializer implements EventDeserializer {
             final String endMessage = getMessage(messageSection, "end");
 
             final RaidsEvent event = new RaidsEvent(
+                    eventData,
                     new RaidsData(
                             abstractMobPlugin,
                             worldName,

@@ -15,6 +15,7 @@ event:
     name: <world-name>
     alias: <world-alias>
     radius: <world-radius>
+    min-radius: <world-min-radius>
   entities:
     <entity-1>: <entity>
     <entity-2>: <entity>
@@ -33,7 +34,9 @@ event:
 # <world-name> [String] : The world name (which is also the world folder name) where the event should take place
 # <world-alias> [String] : The name of the world. It supports colors.
 # <world-radius> [integer] : The radius of the circle where the event should take place.
-#   Its center is at the coordinates (0;0). Every position contained in this circle is valid and chosen randomly.
+#   Its center is the world spawn. Every position contained in this circle is valid and chosen randomly.
+# <world-min-radius> [integer] : The radius of the circle where the event can not take place.
+#   Its center is the world spawn.
 #
 # Entities:
 # <entity-n> : The key of an entity. You can have as many entities as you want. The key just need to be unique.
@@ -69,12 +72,15 @@ type: raids
 
 data:
   command-id: "easy-raid"
+  information:
+    - "A little raid"
 
 event:
   world:
     name: world
     alias: "overworld"
     radius: 300
+    min-radius: 20
   entities:
     1:
       type: ZOMBIE

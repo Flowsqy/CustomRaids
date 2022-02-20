@@ -4,6 +4,8 @@ import fr.flowsqy.abstractmenu.item.ItemBuilder;
 import fr.flowsqy.abstractmob.entity.EntityBuilder;
 import fr.flowsqy.customevents.api.Event;
 import fr.flowsqy.customevents.api.EventData;
+import fr.flowsqy.customraids.data.RaidsData;
+import fr.flowsqy.customraids.data.SpawnData;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -24,6 +26,8 @@ import org.bukkit.util.Vector;
 import java.util.*;
 
 public class RaidsEvent implements Event, Listener {
+
+    private final static int RANDOM_CONSTANT = 100_000;
 
     private final EventData eventData;
     private final RaidsData raidsData;
@@ -49,21 +53,26 @@ public class RaidsEvent implements Event, Listener {
         killPreviousEntities();
 
         // Start the new one
-        final World world = Bukkit.getWorld(raidsData.worldName());
+        final SpawnData spawnData = raidsData.spawnData();
+        final World world = Bukkit.getWorld(spawnData.worldName());
         if (world == null) {
             return;
         }
 
         // Select location
         final Random random = new Random();
-        final int doubledRadius = raidsData.spawnRadius() * 2;
+        final int doubledRadius = spawnData.spawnRadius() * 2;
         final Vector vector = new Vector(
-                random.nextInt(doubledRadius) - raidsData.spawnRadius(),
+                random.nextInt(doubledRadius * RANDOM_CONSTANT) / RANDOM_CONSTANT - spawnData.spawnRadius(),
                 0,
-                random.nextInt(doubledRadius) - raidsData.spawnRadius()
+                random.nextInt(doubledRadius * RANDOM_CONSTANT) / RANDOM_CONSTANT - spawnData.spawnRadius()
         );
-        vector.normalize().multiply((double) raidsData.spawnRadius() * random.nextDouble());
-        spawnLocation = new Location(world, 0, 0, 0).add(vector);
+        int radius_multiplier;
+        do {
+            radius_multiplier = random.nextInt(spawnData.spawnRadius() * RANDOM_CONSTANT);
+        } while (radius_multiplier <= spawnData.minSpawnRadius() * RANDOM_CONSTANT);
+        vector.normalize().multiply(radius_multiplier / RANDOM_CONSTANT);
+        spawnLocation = world.getSpawnLocation().add(vector);
 
         // Spawn and register entities
         for (EntityBuilder entityBuilder : raidsData.raidEntities()) {
@@ -129,7 +138,7 @@ public class RaidsEvent implements Event, Listener {
     private void sendMessage(String rawMessage) {
         if (rawMessage != null) {
             final String message = rawMessage
-                    .replace("%world%", raidsData.worldAlias())
+                    .replace("%world%", raidsData.spawnData().worldAlias())
                     .replace("%x%", String.valueOf(spawnLocation.getBlockX()))
                     .replace("%z%", String.valueOf(spawnLocation.getBlockZ()));
             for (Player player : Bukkit.getOnlinePlayers()) {

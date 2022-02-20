@@ -7,6 +7,8 @@ import fr.flowsqy.abstractmob.entity.EntityBuilderSerializer;
 import fr.flowsqy.customevents.api.Event;
 import fr.flowsqy.customevents.api.EventData;
 import fr.flowsqy.customevents.api.EventDeserializer;
+import fr.flowsqy.customraids.data.RaidsData;
+import fr.flowsqy.customraids.data.SpawnData;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.ConfigurationSection;
@@ -50,7 +52,11 @@ public class RaidsDeserializer implements EventDeserializer {
                 logger.warning("Invalid radius (< 0) in " + fileName);
                 return null;
             }
-
+            final int minSpawnRadius = Math.max(worldSection.getInt("min-radius", 0), 0);
+            if (minSpawnRadius >= spawnRadius) {
+                logger.warning("Invalid min radius, it is greater than the radius");
+                return null;
+            }
 
             // Entities
             final List<EntityBuilder> raidEntities = new LinkedList<>();
@@ -115,9 +121,12 @@ public class RaidsDeserializer implements EventDeserializer {
                     eventData,
                     new RaidsData(
                             abstractMobPlugin,
-                            worldName,
-                            worldAlias,
-                            spawnRadius,
+                            new SpawnData(
+                                    worldName,
+                                    worldAlias,
+                                    spawnRadius,
+                                    minSpawnRadius
+                            ),
                             raidEntities,
                             rewards,
                             startMessage,

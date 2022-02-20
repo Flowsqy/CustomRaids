@@ -1,4 +1,4 @@
-package fr.flowsqy.customraids;
+package fr.flowsqy.customraids.data;
 
 import fr.flowsqy.abstractmenu.item.ItemBuilder;
 import fr.flowsqy.abstractmob.AbstractMobPlugin;
@@ -9,9 +9,7 @@ import java.util.Map;
 
 public record RaidsData(
         AbstractMobPlugin abstractMobPlugin,
-        String worldName,
-        String worldAlias,
-        int spawnRadius,
+        SpawnData spawnData,
         List<EntityBuilder> raidEntities,
         Map<ItemBuilder, List<Integer>> rewards,
         String startMessage,

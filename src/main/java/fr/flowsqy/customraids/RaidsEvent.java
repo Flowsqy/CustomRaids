@@ -24,6 +24,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Vector;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class RaidsEvent implements Event, Listener {
 
@@ -34,6 +35,7 @@ public class RaidsEvent implements Event, Listener {
 
     private final Set<Entity> aliveEntities;
     private Location spawnLocation;
+    private boolean started;
 
     /**
      * Create a raid event
@@ -87,6 +89,8 @@ public class RaidsEvent implements Event, Listener {
 
         // Send start message
         sendMessage(raidsData.startMessage());
+
+        started = true;
     }
 
     @Override
@@ -94,15 +98,38 @@ public class RaidsEvent implements Event, Listener {
         return eventData;
     }
 
+    @Override
+    public void check() {
+        if (started) {
+            // Remove all invalid entities
+            aliveEntities.removeAll(
+                    aliveEntities.stream()
+                            .filter(entity -> !entity.isValid())
+                            .collect(Collectors.toSet())
+            );
+
+            checkFinish();
+        }
+    }
+
     @EventHandler(priority = EventPriority.MONITOR)
     private void onDeath(EntityDeathEvent event) {
-        // Check if an entity
-
+        // Check if the dying entity is one of the raid entity
         if (aliveEntities.remove(event.getEntity())) {
-            // Check if the event is finished
-            if (aliveEntities.isEmpty()) {
-                addChest();
-            }
+            checkFinish();
+        }
+    }
+
+    /**
+     * Check whether the event is finished.
+     * Create the reward chest if every entity is removed
+     */
+    public void checkFinish() {
+        if (aliveEntities.isEmpty() && started) {
+            addChest();
+            // Send end message
+            sendMessage(raidsData.endMessage());
+            started = false;
         }
     }
 
@@ -125,8 +152,6 @@ public class RaidsEvent implements Event, Listener {
                 inventory.setItem(slot, itemStack);
             }
         }
-        // Send end message
-        sendMessage(raidsData.endMessage());
     }
 
     /**

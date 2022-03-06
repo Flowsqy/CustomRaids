@@ -37,7 +37,7 @@
         <dependency>
             <groupId>com.github.Flowsqy</groupId>
             <artifactId>CustomEvents</artifactId>
-            <version>7df302ba78</version>
+            <version>89fbb2de08</version>
             <scope>provided</scope>
         </dependency>
         <dependency>

@@ -96,28 +96,37 @@ public class RaidsEvent implements Event, Listener {
 
     @EventHandler(priority = EventPriority.MONITOR)
     private void onDeath(EntityDeathEvent event) {
+        // Check if an entity
+
         if (aliveEntities.remove(event.getEntity())) {
             // Check if the event is finished
             if (aliveEntities.isEmpty()) {
-                // Set rewards
-                // Create the chest
-                final World world = Objects.requireNonNull(spawnLocation.getWorld());
-                final Block rewardChest = world.getHighestBlockAt(spawnLocation).getRelative(BlockFace.UP);
-                rewardChest.setType(Material.CHEST);
-
-                // Fill the chest with rewards
-                final Chest chest = (Chest) rewardChest.getState();
-                final Inventory inventory = chest.getBlockInventory();
-                for (Map.Entry<ItemBuilder, List<Integer>> entry : raidsData.rewards().entrySet()) {
-                    final ItemStack itemStack = entry.getKey().create(null);
-                    for (int slot : entry.getValue()) {
-                        inventory.setItem(slot, itemStack);
-                    }
-                }
-                // Send end message
-                sendMessage(raidsData.endMessage());
+                addChest();
             }
         }
+    }
+
+    /**
+     * At the reward chest and fill it
+     */
+    private void addChest() {
+        // Set rewards
+        // Create the chest
+        final World world = Objects.requireNonNull(spawnLocation.getWorld());
+        final Block rewardChest = world.getHighestBlockAt(spawnLocation).getRelative(BlockFace.UP);
+        rewardChest.setType(Material.CHEST);
+
+        // Fill the chest with rewards
+        final Chest chest = (Chest) rewardChest.getState();
+        final Inventory inventory = chest.getBlockInventory();
+        for (Map.Entry<ItemBuilder, List<Integer>> entry : raidsData.rewards().entrySet()) {
+            final ItemStack itemStack = entry.getKey().create(null);
+            for (int slot : entry.getValue()) {
+                inventory.setItem(slot, itemStack);
+            }
+        }
+        // Send end message
+        sendMessage(raidsData.endMessage());
     }
 
     /**

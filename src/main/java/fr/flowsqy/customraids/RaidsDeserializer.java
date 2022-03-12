@@ -9,8 +9,10 @@ import fr.flowsqy.customevents.api.EventData;
 import fr.flowsqy.customevents.api.EventDeserializer;
 import fr.flowsqy.customraids.data.RaidsData;
 import fr.flowsqy.customraids.data.SpawnData;
+import fr.flowsqy.customraids.progressionbar.ProgressionBar;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Bukkit;
+import org.bukkit.boss.BarColor;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.plugin.Plugin;
 
@@ -28,6 +30,27 @@ public class RaidsDeserializer implements EventDeserializer {
     public RaidsDeserializer(CustomRaidsPlugin customRaidsPlugin, List<RaidsEvent> raidsEvents) {
         this.customRaidsPlugin = customRaidsPlugin;
         this.raidsEvents = raidsEvents;
+    }
+
+    /**
+     * Get an enum constant from its name
+     *
+     * @param enumClass    The enum class
+     * @param constantName The name of the enum constant
+     * @param defaultValue The default value that will be returned if there is no constant matching the given name
+     * @param <T>          The enum type
+     * @return The found enum constant or the default value if there is constant matching the given name
+     */
+    private static <T extends Enum<T>> T getEnumConstant(Class<T> enumClass, String constantName, T defaultValue) {
+        if (constantName == null) {
+            return defaultValue;
+        }
+        for (T constant : enumClass.getEnumConstants()) {
+            if (constant.name().equals(constantName)) {
+                return constant;
+            }
+        }
+        return defaultValue;
     }
 
     @Override
@@ -107,6 +130,21 @@ public class RaidsDeserializer implements EventDeserializer {
                 }
             }
 
+            // ProgressionBar
+            final ConfigurationSection barSection = section.getConfigurationSection("progression-bar");
+            final ProgressionBar progressionBar;
+            if (barSection != null && barSection.getBoolean("enable")) {
+                final String title = barSection.getString("title");
+                progressionBar = new ProgressionBar(
+                        true,
+                        customRaidsPlugin,
+                        getEnumConstant(BarColor.class, barSection.getString("color"), BarColor.RED),
+                        barSection.getInt("radius", -1),
+                        title == null ? null : ChatColor.translateAlternateColorCodes('&', title)
+                );
+            } else {
+                progressionBar = ProgressionBar.NULL;
+            }
 
             // Messages
             final ConfigurationSection messageSection = section.getConfigurationSection("messages");
@@ -128,6 +166,7 @@ public class RaidsDeserializer implements EventDeserializer {
                                     minSpawnRadius
                             ),
                             raidEntities,
+                            progressionBar,
                             rewards,
                             startMessage,
                             endMessage

@@ -87,6 +87,16 @@ public class RaidsEvent implements Event, Listener {
             aliveEntities.addAll(spawnedEntities);
         }
 
+        // Load the progression bar
+        if (raidsData.progressionBar().isEnable()) {
+            raidsData.progressionBar().load(
+                    world,
+                    spawnLocation.getBlockX(),
+                    spawnLocation.getBlockZ(),
+                    aliveEntities.size()
+            );
+        }
+
         // Send start message
         sendMessage(raidsData.startMessage());
 
@@ -108,6 +118,7 @@ public class RaidsEvent implements Event, Listener {
                             .collect(Collectors.toSet())
             );
 
+            refreshProgressionBar();
             checkFinish();
         }
     }
@@ -116,7 +127,17 @@ public class RaidsEvent implements Event, Listener {
     private void onDeath(EntityDeathEvent event) {
         // Check if the dying entity is one of the raid entity
         if (aliveEntities.remove(event.getEntity())) {
+            refreshProgressionBar();
             checkFinish();
+        }
+    }
+
+    /**
+     * Refresh the progression bar if needed
+     */
+    private void refreshProgressionBar() {
+        if (raidsData.progressionBar().isEnable()) {
+            raidsData.progressionBar().refresh(aliveEntities.size());
         }
     }
 
@@ -126,6 +147,9 @@ public class RaidsEvent implements Event, Listener {
      */
     public void checkFinish() {
         if (aliveEntities.isEmpty() && started) {
+            if (raidsData.progressionBar().isEnable()) {
+                raidsData.progressionBar().unload();
+            }
             addChest();
             // Send end message
             sendMessage(raidsData.endMessage());

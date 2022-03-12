@@ -20,6 +20,11 @@ event:
     <entity-1>: <entity>
     <entity-2>: <entity>
     ...
+  progression-bar:
+    enable: <bar-enable>
+    title: <bar-title>
+    color: <bar-color>
+    radius: <bar-radius>
   rewards:
     <item-1>: <item>
     <item-2>: <item>
@@ -42,6 +47,15 @@ event:
 # <entity-n> : The key of an entity. You can have as many entities as you want. The key just need to be unique.
 # <entity> [https://github.com/Flowsqy/AbstractMob] :
 #   An AbstractMob entity. Represent an entity that will be spawned.
+#
+# Progression bar:
+# <bar-enable> [boolean] : Whether the progression bar should be used
+# <bar-title> [String] : The progression bar title. It supports colors
+# <bar-color> [https://hub.spigotmc.org/javadocs/spigot/org/bukkit/boss/BarColor.html] : 
+#   The color of the progression bar
+# <bar-radius> [integer] : The radius of the circle where players see the progression bar
+#   Set it to 0 will show the bar to every player on the world where the event take place.
+#   Set it to a negative number will show the bar to every player on the server
 #
 # Rewards:
 # <item-n> : The key of a reward. You can have as many entities as you want. The key just need to be unique.

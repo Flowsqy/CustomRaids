@@ -60,11 +60,15 @@ public class ProgressionBar implements Listener {
      * Unload the bar
      */
     public void unload() {
-        bossBar = null;
         HandlerList.unregisterAll(this);
         task.cancel();
         task = null;
         this.maxEntity = 0;
+        bossBar.setVisible(false);
+        for (Player player : bossBar.getPlayers()) {
+            bossBar.removePlayer(player);
+        }
+        bossBar = null;
     }
 
     /**

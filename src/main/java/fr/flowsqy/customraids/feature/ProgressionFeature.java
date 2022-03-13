@@ -20,6 +20,7 @@ public class ProgressionFeature extends ZonedFeature implements Listener {
     private final CustomRaidsPlugin plugin;
     private final BarColor color;
     private final String title;
+    private boolean loaded;
     private int maxEntity;
     private BukkitTask task;
     private BossBar bossBar;
@@ -40,6 +41,9 @@ public class ProgressionFeature extends ZonedFeature implements Listener {
      * @param maxEntity The number of entity to kill to end the {@link fr.flowsqy.customraids.RaidsEvent}
      */
     public void load(World world, int xCenter, int zCenter, int maxEntity) {
+        if (loaded) {
+            throw new IllegalStateException("This progression feature is already loaded");
+        }
         bossBar = Bukkit.createBossBar(title, color, BarStyle.SOLID);
         Bukkit.getPluginManager().registerEvents(this, plugin);
         task = Bukkit.getScheduler().runTaskTimerAsynchronously(
@@ -49,12 +53,16 @@ public class ProgressionFeature extends ZonedFeature implements Listener {
                 20L
         );
         this.maxEntity = maxEntity;
+        loaded = true;
     }
 
     /**
      * Unload the bar
      */
     public void unload() {
+        if (!loaded) {
+            return;
+        }
         HandlerList.unregisterAll(this);
         task.cancel();
         task = null;
@@ -64,6 +72,7 @@ public class ProgressionFeature extends ZonedFeature implements Listener {
             bossBar.removePlayer(player);
         }
         bossBar = null;
+        loaded = false;
     }
 
     /**

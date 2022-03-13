@@ -56,6 +56,7 @@ public class RaidsEvent implements Event, Listener {
     public void perform() {
         // End previous event
         killPreviousEntities();
+        unloadFeatures();
 
         // Start the new one
         final SpawnData spawnData = raidsData.spawnData();

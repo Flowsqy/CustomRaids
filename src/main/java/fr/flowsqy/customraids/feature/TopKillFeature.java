@@ -26,6 +26,7 @@ public class TopKillFeature extends ZonedFeature implements Listener {
     private final String message;
     private final ChatMessageType messageType;
     private final Map<UUID, Integer> playerKills;
+    private boolean loaded;
 
     public TopKillFeature(boolean enable, CustomRaidsPlugin plugin, int radius, String message, ChatMessageType messageType) {
         super(enable, radius);
@@ -40,15 +41,23 @@ public class TopKillFeature extends ZonedFeature implements Listener {
      * Load the kill counter for a {@link fr.flowsqy.customraids.RaidsEvent}
      */
     public void load() {
+        if (loaded) {
+            throw new IllegalStateException("This top killer feature is already loaded");
+        }
         Bukkit.getPluginManager().registerEvents(this, plugin);
+        loaded = true;
     }
 
     /**
      * Unload the kill counter
      */
     public void unload() {
+        if (!loaded) {
+            return;
+        }
         HandlerList.unregisterAll(this);
         playerKills.clear();
+        loaded = false;
     }
 
     /**

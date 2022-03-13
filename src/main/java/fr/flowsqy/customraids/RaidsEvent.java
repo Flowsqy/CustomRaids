@@ -33,7 +33,7 @@ public class RaidsEvent implements Event, Listener {
     private final EventData eventData;
     private final RaidsData raidsData;
 
-    private final Set<Entity> aliveEntities;
+    private final Map<UUID, Entity> aliveEntities;
     private Location spawnLocation;
     private boolean started;
 
@@ -46,7 +46,7 @@ public class RaidsEvent implements Event, Listener {
     RaidsEvent(EventData eventData, RaidsData raidsData) {
         this.eventData = eventData;
         this.raidsData = raidsData;
-        this.aliveEntities = new HashSet<>();
+        this.aliveEntities = new HashMap<>();
     }
 
     @Override
@@ -84,7 +84,9 @@ public class RaidsEvent implements Event, Listener {
                     entityBuilder.getRadius(),
                     true
             );
-            aliveEntities.addAll(spawnedEntities);
+            for (Entity entity : spawnedEntities) {
+                aliveEntities.put(entity.getUniqueId(), entity);
+            }
         }
 
         // Load the progression bar
@@ -112,11 +114,12 @@ public class RaidsEvent implements Event, Listener {
     public void check() {
         if (started) {
             // Remove all invalid entities
-            aliveEntities.removeAll(
-                    aliveEntities.stream()
-                            .filter(entity -> !entity.isValid())
-                            .collect(Collectors.toSet())
-            );
+            aliveEntities.entrySet()
+                    .stream()
+                    .filter(entry -> !entry.getValue().isValid())
+                    .map(Map.Entry::getKey)
+                    .collect(Collectors.toSet()) // Get every key of invalid entities
+                    .forEach(aliveEntities::remove); // Remove them
 
             refreshProgressionBar();
             checkFinish();
@@ -126,7 +129,7 @@ public class RaidsEvent implements Event, Listener {
     @EventHandler(priority = EventPriority.MONITOR)
     private void onDeath(EntityDeathEvent event) {
         // Check if the dying entity is one of the raid entity
-        if (aliveEntities.remove(event.getEntity())) {
+        if (aliveEntities.remove(event.getEntity().getUniqueId()) != null) {
             refreshProgressionBar();
             checkFinish();
         }
@@ -182,7 +185,7 @@ public class RaidsEvent implements Event, Listener {
      * Remove the entities from the previous event
      */
     public void killPreviousEntities() {
-        for (Entity entity : aliveEntities) {
+        for (Entity entity : aliveEntities.values()) {
             entity.remove();
         }
         aliveEntities.clear();

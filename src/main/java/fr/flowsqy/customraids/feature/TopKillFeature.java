@@ -101,12 +101,12 @@ public class TopKillFeature extends ZonedFeature implements Listener {
             return;
         }
 
-        Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
-            final Map.Entry<UUID, Integer> topKillEntry = getTopKiller();
-            if (topKillEntry == null) {
-                return;
-            }
+        final Map.Entry<UUID, Integer> topKillEntry = getTopKiller();
+        if (topKillEntry == null) {
+            return;
+        }
 
+        Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
             final OfflinePlayer topKiller = Bukkit.getOfflinePlayer(topKillEntry.getKey());
             final String playerName = topKiller.getName();
             Objects.requireNonNull(playerName, "The name of the top killer is null");

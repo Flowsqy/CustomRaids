@@ -71,7 +71,7 @@ event:
 # <topkill-radius> [integer] : The radius of the circle where players see the message
 #   Set it to 0 will show the message to every player on the world where the event take place.
 #   Set it to a negative number will show the message to every player on the server
-# <topkill-type> [https://javadoc.io/doc/net.md-5/bungeecord-chat/latest/index.html] : 
+# <topkill-type> [https://javadoc.io/doc/net.md-5/bungeecord-chat/latest/net/md_5/bungee/api/ChatMessageType.html] : 
 #   The type of message to send. 'CHAT' by default
 # Rewards:
 # <item-n> : The key of a reward. You can have as many entities as you want. The key just need to be unique.

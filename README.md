@@ -20,11 +20,17 @@ event:
     <entity-1>: <entity>
     <entity-2>: <entity>
     ...
-  progression-bar:
-    enable: <bar-enable>
-    title: <bar-title>
-    color: <bar-color>
-    radius: <bar-radius>
+  features:
+    progression-bar:
+      enable: <bar-enable>
+      title: <bar-title>
+      color: <bar-color>
+      radius: <bar-radius>
+    top-kill:
+      enable: <topkill-enable>
+      radius: <topkill-radius>
+      message: <topkill-message>
+      type: <topkill-type>
   rewards:
     <item-1>: <item>
     <item-2>: <item>
@@ -57,6 +63,16 @@ event:
 #   Set it to 0 will show the bar to every player on the world where the event take place.
 #   Set it to a negative number will show the bar to every player on the server
 #
+# Top killer message:
+# <topkill-enable> [boolean] : Whether the top kill message should be displayed
+# <topkill-message> [String] : The message to send
+#   %count% will be replaced by the kill count of the top killer
+#   %player% will be replaced by the name of the top killer
+# <topkill-radius> [integer] : The radius of the circle where players see the message
+#   Set it to 0 will show the message to every player on the world where the event take place.
+#   Set it to a negative number will show the message to every player on the server
+# <topkill-type> [https://javadoc.io/doc/net.md-5/bungeecord-chat/latest/index.html] : 
+#   The type of message to send. 'CHAT' by default
 # Rewards:
 # <item-n> : The key of a reward. You can have as many entities as you want. The key just need to be unique.
 # <item> [https://github.com/Flowsqy/AbstractMenu] (Inventory section) :

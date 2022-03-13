@@ -4,8 +4,11 @@ import fr.flowsqy.abstractmenu.item.ItemBuilder;
 import fr.flowsqy.abstractmob.entity.EntityBuilder;
 import fr.flowsqy.customevents.api.Event;
 import fr.flowsqy.customevents.api.EventData;
+import fr.flowsqy.customraids.data.FeaturesData;
 import fr.flowsqy.customraids.data.RaidsData;
 import fr.flowsqy.customraids.data.SpawnData;
+import fr.flowsqy.customraids.feature.ProgressionFeature;
+import fr.flowsqy.customraids.feature.TopKillFeature;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -89,14 +92,24 @@ public class RaidsEvent implements Event, Listener {
             }
         }
 
+        // Load features
+        final FeaturesData featuresData = raidsData.featuresData();
+
         // Load the progression bar
-        if (raidsData.progressionBar().isEnable()) {
-            raidsData.progressionBar().load(
+        final ProgressionFeature progression = featuresData.progression();
+        if (progression.isEnable()) {
+            progression.load(
                     world,
                     spawnLocation.getBlockX(),
                     spawnLocation.getBlockZ(),
                     aliveEntities.size()
             );
+        }
+
+        // Load top killer counter
+        final TopKillFeature topKillFeature = featuresData.topKill();
+        if (topKillFeature.isEnable()) {
+            topKillFeature.load();
         }
 
         // Send start message
@@ -121,7 +134,7 @@ public class RaidsEvent implements Event, Listener {
                     .collect(Collectors.toSet()) // Get every key of invalid entities
                     .forEach(aliveEntities::remove); // Remove them
 
-            refreshProgressionBar();
+            refreshProgression();
             checkFinish();
         }
     }
@@ -130,17 +143,25 @@ public class RaidsEvent implements Event, Listener {
     private void onDeath(EntityDeathEvent event) {
         // Check if the dying entity is one of the raid entity
         if (aliveEntities.remove(event.getEntity().getUniqueId()) != null) {
-            refreshProgressionBar();
+            refreshProgression();
+
+            // Actualize the kill counters
+            final TopKillFeature topKillFeature = raidsData.featuresData().topKill();
+            if (topKillFeature.isEnable()) {
+                topKillFeature.entityDied(event);
+            }
+
             checkFinish();
         }
     }
 
     /**
-     * Refresh the progression bar if needed
+     * Refresh the progression if needed
      */
-    private void refreshProgressionBar() {
-        if (raidsData.progressionBar().isEnable()) {
-            raidsData.progressionBar().refresh(aliveEntities.size());
+    private void refreshProgression() {
+        final ProgressionFeature progression = raidsData.featuresData().progression();
+        if (progression.isEnable()) {
+            progression.refresh(aliveEntities.size());
         }
     }
 
@@ -150,13 +171,36 @@ public class RaidsEvent implements Event, Listener {
      */
     public void checkFinish() {
         if (aliveEntities.isEmpty() && started) {
-            if (raidsData.progressionBar().isEnable()) {
-                raidsData.progressionBar().unload();
+            // Send the top killer message
+            final TopKillFeature topKillFeature = raidsData.featuresData().topKill();
+            if (topKillFeature.isEnable()) {
+                topKillFeature.sendMessage(spawnLocation.getWorld(), spawnLocation.getBlockX(), spawnLocation.getBlockZ());
             }
+
             addChest();
             // Send end message
             sendMessage(raidsData.endMessage());
+            unloadFeatures();
             started = false;
+        }
+    }
+
+    /**
+     * Unload the features loaded for this event
+     */
+    public void unloadFeatures() {
+        final FeaturesData featuresData = raidsData.featuresData();
+
+        // Unload progression features
+        final ProgressionFeature progression = featuresData.progression();
+        if (progression.isEnable()) {
+            progression.unload();
+        }
+
+        // Unload the top killer feature
+        final TopKillFeature topKillFeature = featuresData.topKill();
+        if (topKillFeature.isEnable()) {
+            topKillFeature.unload();
         }
     }
 

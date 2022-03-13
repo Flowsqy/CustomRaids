@@ -7,10 +7,13 @@ import fr.flowsqy.abstractmob.entity.EntityBuilderSerializer;
 import fr.flowsqy.customevents.api.Event;
 import fr.flowsqy.customevents.api.EventData;
 import fr.flowsqy.customevents.api.EventDeserializer;
+import fr.flowsqy.customraids.data.FeaturesData;
 import fr.flowsqy.customraids.data.RaidsData;
 import fr.flowsqy.customraids.data.SpawnData;
-import fr.flowsqy.customraids.progressionbar.ProgressionBar;
+import fr.flowsqy.customraids.feature.ProgressionFeature;
+import fr.flowsqy.customraids.feature.TopKillFeature;
 import net.md_5.bungee.api.ChatColor;
+import net.md_5.bungee.api.ChatMessageType;
 import org.bukkit.Bukkit;
 import org.bukkit.boss.BarColor;
 import org.bukkit.configuration.ConfigurationSection;
@@ -130,20 +133,12 @@ public class RaidsDeserializer implements EventDeserializer {
                 }
             }
 
-            // ProgressionBar
-            final ConfigurationSection barSection = section.getConfigurationSection("progression-bar");
-            final ProgressionBar progressionBar;
-            if (barSection != null && barSection.getBoolean("enable")) {
-                final String title = barSection.getString("title");
-                progressionBar = new ProgressionBar(
-                        true,
-                        customRaidsPlugin,
-                        getEnumConstant(BarColor.class, barSection.getString("color"), BarColor.RED),
-                        barSection.getInt("radius", -1),
-                        title == null ? null : ChatColor.translateAlternateColorCodes('&', title)
-                );
+            final ConfigurationSection featuresSection = section.getConfigurationSection("features");
+            final FeaturesData featuresData;
+            if (featuresSection != null) {
+                featuresData = deserializeFeatures(featuresSection);
             } else {
-                progressionBar = ProgressionBar.NULL;
+                featuresData = new FeaturesData(ProgressionFeature.NULL, TopKillFeature.NULL);
             }
 
             // Messages
@@ -166,7 +161,7 @@ public class RaidsDeserializer implements EventDeserializer {
                                     minSpawnRadius
                             ),
                             raidEntities,
-                            progressionBar,
+                            featuresData,
                             rewards,
                             startMessage,
                             endMessage
@@ -179,6 +174,51 @@ public class RaidsDeserializer implements EventDeserializer {
             logger.warning("Can not get the AbstractMob instance");
             return null;
         }
+    }
+
+    /**
+     * Deserialize a {@link fr.flowsqy.customraids.feature.Feature}
+     *
+     * @param featuresSection The {@link ConfigurationSection} that contains every feature
+     * @return The {@link FeaturesData} described by the given {@link ConfigurationSection}
+     */
+    private FeaturesData deserializeFeatures(ConfigurationSection featuresSection) {
+        // ProgressionBar
+        final ConfigurationSection barSection = featuresSection.getConfigurationSection("progression-bar");
+        final ProgressionFeature progressionFeature;
+        if (barSection != null && barSection.getBoolean("enable")) {
+            final String title = barSection.getString("title");
+            progressionFeature = new ProgressionFeature(
+                    true,
+                    customRaidsPlugin,
+                    barSection.getInt("radius", -1),
+                    getEnumConstant(BarColor.class, barSection.getString("color"), BarColor.RED),
+                    title == null ? null : ChatColor.translateAlternateColorCodes('&', title)
+            );
+        } else {
+            progressionFeature = ProgressionFeature.NULL;
+        }
+
+        // TopKillFeature
+        final ConfigurationSection topKillSection = featuresSection.getConfigurationSection("top-kill");
+        final TopKillFeature topKillFeature;
+        if (topKillSection != null && topKillSection.getBoolean("enable")) {
+            final String message = topKillSection.getString("message");
+            topKillFeature = new TopKillFeature(
+                    true,
+                    customRaidsPlugin,
+                    topKillSection.getInt("radius", -1),
+                    message == null ? null : ChatColor.translateAlternateColorCodes('&', message),
+                    getEnumConstant(ChatMessageType.class, topKillSection.getString("type"), ChatMessageType.CHAT)
+            );
+        } else {
+            topKillFeature = TopKillFeature.NULL;
+        }
+
+        return new FeaturesData(
+                progressionFeature,
+                topKillFeature
+        );
     }
 
     /**

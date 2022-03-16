@@ -210,7 +210,8 @@ public class RaidsDeserializer implements EventDeserializer {
                     topKillSection.getInt("radius", -1),
                     message == null ? null : ChatColor.translateAlternateColorCodes('&', message),
                     getEnumConstant(ChatMessageType.class, topKillSection.getString("type"), ChatMessageType.CHAT),
-                    topKillSection.getBoolean("permanent")
+                    topKillSection.getString("permanent.message"),
+                    topKillSection.getInt("permanent.radius")
             );
         } else {
             topKillFeature = TopKillFeature.NULL;

@@ -10,7 +10,7 @@ import java.util.Set;
 
 public class ZonedFeature extends Feature {
 
-    private final int radius;
+    protected final int radius;
 
     public ZonedFeature(boolean enable, int radius) {
         super(enable);
@@ -25,6 +25,19 @@ public class ZonedFeature extends Feature {
      * @param zCenter The z coordinate of the location where the {@link fr.flowsqy.customraids.RaidsEvent} take place
      */
     protected Set<Player> calculateViewers(World world, int xCenter, int zCenter) {
+        return calculateViewers(world, xCenter, zCenter, radius);
+    }
+
+    /**
+     * Calculate which players must use the feature
+     *
+     * @param world   The {@link World} where the event is
+     * @param xCenter The x coordinate of the location where the {@link fr.flowsqy.customraids.RaidsEvent} take place
+     * @param zCenter The z coordinate of the location where the {@link fr.flowsqy.customraids.RaidsEvent} take place
+     * @param radius  The radius of the circle where players must use the feature.
+     *                A radius of 0 take the whole world player list and a negative radius every players on the server
+     */
+    protected Set<Player> calculateViewers(World world, int xCenter, int zCenter, int radius) {
         // Get all players that must see the boss bar
         final Set<Player> players;
         if (radius > 0) {

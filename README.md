@@ -57,6 +57,11 @@ event:
 # Progression bar:
 # <bar-enable> [boolean] : Whether the progression bar should be used
 # <bar-title> [String] : The progression bar title. It supports colors
+#   There are few placeholders for the title : 
+#     '%max_entities%' : The count of spawned entities
+#     '%entities%'     : The count of remaining entities
+#     '%proportion%'   : The proportion of remaining mob from spawned mob
+#     '%percentage%'   : The percentage representing the above proportion
 # <bar-color> [https://hub.spigotmc.org/javadocs/spigot/org/bukkit/boss/BarColor.html] : 
 #   The color of the progression bar
 # <bar-radius> [integer] : The radius of the circle where players see the progression bar

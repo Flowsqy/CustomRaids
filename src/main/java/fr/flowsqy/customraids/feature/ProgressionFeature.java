@@ -45,6 +45,7 @@ public class ProgressionFeature extends ZonedFeature implements Listener {
             throw new IllegalStateException("This progression feature is already loaded");
         }
         bossBar = Bukkit.createBossBar(title, color, BarStyle.SOLID);
+        formatTitle(maxEntity);
         Bukkit.getPluginManager().registerEvents(this, plugin);
         task = Bukkit.getScheduler().runTaskTimerAsynchronously(
                 plugin,
@@ -103,8 +104,32 @@ public class ProgressionFeature extends ZonedFeature implements Listener {
      *
      * @param remainingEntity The number of remaining entity
      */
-    public void refresh(double remainingEntity) {
-        bossBar.setProgress(remainingEntity / maxEntity);
+    public void refresh(int remainingEntity) {
+        bossBar.setProgress((double) remainingEntity / maxEntity);
+        formatTitle(remainingEntity);
     }
+
+    /**
+     * Refresh the {@link BossBar} title
+     *
+     * @param remainingEntity The count of remaining entity
+     */
+    private void formatTitle(int remainingEntity) {
+        if (title != null) {
+            // Get the new title
+            final double proportion = (double) remainingEntity / maxEntity;
+            final String formattedTitle = title
+                    .replace("%max_entities%", String.valueOf(maxEntity))
+                    .replace("%entities%", String.valueOf(remainingEntity))
+                    .replace("%proportion%", String.valueOf(proportion))
+                    .replace("%percentage%", String.valueOf(proportion * 100));
+
+            // Send it if necessary
+            if (!formattedTitle.equals(title)) {
+                bossBar.setTitle(formattedTitle);
+            }
+        }
+    }
+
 
 }

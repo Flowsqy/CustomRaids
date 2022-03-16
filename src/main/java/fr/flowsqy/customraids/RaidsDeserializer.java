@@ -204,13 +204,14 @@ public class RaidsDeserializer implements EventDeserializer {
         final TopKillFeature topKillFeature;
         if (topKillSection != null && topKillSection.getBoolean("enable")) {
             final String message = topKillSection.getString("message");
+            final String permanentMessage = topKillSection.getString("permanent.message");
             topKillFeature = new TopKillFeature(
                     true,
                     customRaidsPlugin,
                     topKillSection.getInt("radius", -1),
                     message == null ? null : ChatColor.translateAlternateColorCodes('&', message),
                     getEnumConstant(ChatMessageType.class, topKillSection.getString("type"), ChatMessageType.CHAT),
-                    topKillSection.getString("permanent.message"),
+                    permanentMessage == null ? null : ChatColor.translateAlternateColorCodes('&', permanentMessage),
                     topKillSection.getInt("permanent.radius")
             );
         } else {

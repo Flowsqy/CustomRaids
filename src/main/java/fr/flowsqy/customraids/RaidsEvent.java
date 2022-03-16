@@ -110,7 +110,11 @@ public class RaidsEvent implements Event, Listener {
         // Load top killer counter
         final TopKillFeature topKillFeature = featuresData.topKill();
         if (topKillFeature.isEnable()) {
-            topKillFeature.load();
+            topKillFeature.load(
+                    world,
+                    spawnLocation.getBlockX(),
+                    spawnLocation.getBlockZ()
+            );
         }
 
         // Send start message

@@ -31,6 +31,7 @@ event:
       radius: <topkill-radius>
       message: <topkill-message>
       type: <topkill-type>
+      permanent: <topkill-permanent>
   rewards:
     <item-1>: <item>
     <item-2>: <item>
@@ -78,6 +79,10 @@ event:
 #   Set it to a negative number will show the message to every player on the server
 # <topkill-type> [https://javadoc.io/doc/net.md-5/bungeecord-chat/latest/net/md_5/bungee/api/ChatMessageType.html] : 
 #   The type of message to send. 'CHAT' by default
+# <topkill-permanent> [boolean] : Whether the message should be permanent.
+#   This is only effective if the message type is "ACTION_BAR"
+#   If the message is permanent, it will always be displayed on the screen.
+#   If not, the message will only be displayed at the end of the event
 # Rewards:
 # <item-n> : The key of a reward. You can have as many entities as you want. The key just need to be unique.
 # <item> [https://github.com/Flowsqy/AbstractMenu] (Inventory section) :

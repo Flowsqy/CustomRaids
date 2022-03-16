@@ -54,15 +54,15 @@ public class TopKillFeature extends ZonedFeature implements Listener {
             return;
         }
 
-        // Create a task if the message must be permanent only if it's in action bar (prevent useless spamming)
-        if (messageType == ChatMessageType.ACTION_BAR && permanent) {
+        // Create a task if the message must be permanent
+        if (permanent) {
             taskRunnable = () -> {
                 final Map.Entry<UUID, Integer> topKillEntry = getTopKiller();
                 if (topKillEntry == null) {
                     return;
                 }
 
-                sendActionBarMessage(topKillEntry, world, xCenter, zCenter);
+                sendActionBarMessage(topKillEntry, world, xCenter, zCenter, ChatMessageType.ACTION_BAR);
             };
             task = Bukkit.getScheduler().runTaskTimerAsynchronously(plugin, taskRunnable, 0L, 40L);
             // 40L Is the maximum amount of ticks before the message start to shade itself
@@ -151,7 +151,7 @@ public class TopKillFeature extends ZonedFeature implements Listener {
             return;
         }
 
-        Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> sendActionBarMessage(topKillEntry, world, xCenter, zCenter));
+        Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> sendActionBarMessage(topKillEntry, world, xCenter, zCenter, messageType));
     }
 
     /**
@@ -161,8 +161,9 @@ public class TopKillFeature extends ZonedFeature implements Listener {
      * @param world        The {@link World} where the event is
      * @param xCenter      The x coordinate of the location where the {@link fr.flowsqy.customraids.RaidsEvent} take place
      * @param zCenter      The z coordinate of the location where the {@link fr.flowsqy.customraids.RaidsEvent} take place
+     * @param messageType  The {@link ChatMessageType} type of the message to send
      */
-    private void sendActionBarMessage(Map.Entry<UUID, Integer> topKillEntry, World world, int xCenter, int zCenter) {
+    private void sendActionBarMessage(Map.Entry<UUID, Integer> topKillEntry, World world, int xCenter, int zCenter, ChatMessageType messageType) {
         final OfflinePlayer topKiller = Bukkit.getOfflinePlayer(topKillEntry.getKey());
         final String playerName = topKiller.getName();
         Objects.requireNonNull(playerName, "The name of the top killer is null");

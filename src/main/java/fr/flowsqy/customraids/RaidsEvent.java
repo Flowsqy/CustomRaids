@@ -17,11 +17,13 @@ import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.Chest;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDeathEvent;
+import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Vector;
@@ -146,14 +148,29 @@ public class RaidsEvent implements Event, Listener {
 
     @EventHandler(priority = EventPriority.MONITOR)
     private void onDeath(EntityDeathEvent event) {
+        detectDeath(event.getEntity());
+    }
+
+    @EventHandler(priority = EventPriority.MONITOR)
+    private void onExplode(EntityExplodeEvent event) {
+        detectDeath(event.getEntity());
+    }
+
+
+    /**
+     * Detect a death in the raid {@link Entity} list
+     *
+     * @param entity The entity to check
+     */
+    private void detectDeath(Entity entity) {
         // Check if the dying entity is one of the raid entity
-        if (aliveEntities.remove(event.getEntity().getUniqueId()) != null) {
+        if (aliveEntities.remove(entity.getUniqueId()) != null) {
             refreshProgression();
 
             // Actualize the kill counters
             final TopKillFeature topKillFeature = raidsData.featuresData().topKill();
-            if (topKillFeature.isEnable()) {
-                topKillFeature.entityDied(event);
+            if (topKillFeature.isEnable() && entity instanceof LivingEntity livingEntity) {
+                topKillFeature.entityDied(livingEntity);
             }
 
             checkFinish();

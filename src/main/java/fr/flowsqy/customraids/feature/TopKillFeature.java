@@ -11,7 +11,6 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
-import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.scheduler.BukkitTask;
 
 import java.util.Map;
@@ -126,18 +125,17 @@ public class TopKillFeature extends ZonedFeature implements Listener {
 
     /**
      * Tell that a raid entity died
-     * It works as an entry point
      *
-     * @param entityDeathEvent The {@link EntityDeathEvent} that represents the entity death
+     * @param entity The dead raid {@link LivingEntity}
      */
-    public void entityDied(EntityDeathEvent entityDeathEvent) {
+    public void entityDied(LivingEntity entity) {
         // Don't store kill counts if the messages is null
         if (isUnused()) {
             return;
         }
 
         // Increment a kill count if the kill is made by a player
-        final LivingEntity killer = entityDeathEvent.getEntity().getKiller();
+        final LivingEntity killer = entity.getKiller();
         if (killer instanceof Player player) {
             final int kills = playerKills.getOrDefault(player.getUniqueId(), 0);
             playerKills.put(player.getUniqueId(), kills + 1);

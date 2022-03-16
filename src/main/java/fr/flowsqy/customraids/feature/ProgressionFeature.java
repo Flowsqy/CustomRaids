@@ -110,6 +110,15 @@ public class ProgressionFeature extends ZonedFeature implements Listener {
     }
 
     /**
+     * Modify the current number original entities
+     *
+     * @param modifier The modifier to apply. It will be added to the current number
+     */
+    public void modifyMaxEntity(int modifier) {
+        this.maxEntity += modifier;
+    }
+
+    /**
      * Refresh the {@link BossBar} title
      *
      * @param remainingEntity The count of remaining entity

@@ -24,6 +24,7 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.EntityExplodeEvent;
+import org.bukkit.event.entity.EntityTransformEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Vector;
@@ -156,6 +157,24 @@ public class RaidsEvent implements Event, Listener {
         detectDeath(event.getEntity());
     }
 
+    @EventHandler(priority = EventPriority.MONITOR)
+    private void onTransform(EntityTransformEvent event) {
+        // Check if the transformed entity is used in this event
+        if (aliveEntities.remove(event.getEntity().getUniqueId()) != null) {
+            // Add new entities
+            final List<Entity> transformedEntities = event.getTransformedEntities();
+            for (Entity newEntity : transformedEntities) {
+                aliveEntities.put(newEntity.getUniqueId(), newEntity);
+            }
+
+            // Modify the progression bar and refresh it
+            final ProgressionFeature progressionFeature = raidsData.featuresData().progression();
+            if (progressionFeature.isEnable() && transformedEntities.size() != 1) {
+                progressionFeature.modifyMaxEntity(transformedEntities.size() - 1);
+                progressionFeature.refresh(aliveEntities.size());
+            }
+        }
+    }
 
     /**
      * Detect a death in the raid {@link Entity} list

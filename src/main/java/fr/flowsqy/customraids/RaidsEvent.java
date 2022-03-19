@@ -152,12 +152,12 @@ public class RaidsEvent implements Event, Listener {
         detectDeath(event.getEntity());
     }
 
-    @EventHandler(priority = EventPriority.MONITOR)
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     private void onExplode(EntityExplodeEvent event) {
         detectDeath(event.getEntity());
     }
 
-    @EventHandler(priority = EventPriority.MONITOR)
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     private void onTransform(EntityTransformEvent event) {
         // Check if the transformed entity is used in this event
         if (aliveEntities.remove(event.getEntity().getUniqueId()) != null) {

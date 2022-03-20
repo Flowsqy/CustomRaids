@@ -69,19 +69,27 @@ public class RaidsEvent implements Event, Listener {
         }
 
         // Select location
-        final Random random = new Random();
-        final int doubledRadius = spawnData.spawnRadius() * 2;
-        final Vector vector = new Vector(
-                random.nextInt(doubledRadius * RANDOM_CONSTANT) / RANDOM_CONSTANT - spawnData.spawnRadius(),
-                0,
-                random.nextInt(doubledRadius * RANDOM_CONSTANT) / RANDOM_CONSTANT - spawnData.spawnRadius()
-        );
-        int radius_multiplier;
+        int tries = 0;
         do {
-            radius_multiplier = random.nextInt(spawnData.spawnRadius() * RANDOM_CONSTANT);
-        } while (radius_multiplier <= spawnData.minSpawnRadius() * RANDOM_CONSTANT);
-        vector.normalize().multiply(radius_multiplier / RANDOM_CONSTANT);
-        spawnLocation = world.getSpawnLocation().add(vector);
+            if (tries >= 100) {
+                throw new RuntimeException("Could not get a spawn location for the raid event," +
+                        " every calculated positions (100) where in a cancelled biome");
+            }
+            final Random random = new Random();
+            final int doubledRadius = spawnData.spawnRadius() * 2;
+            final Vector vector = new Vector(
+                    random.nextInt(doubledRadius * RANDOM_CONSTANT) / RANDOM_CONSTANT - spawnData.spawnRadius(),
+                    0,
+                    random.nextInt(doubledRadius * RANDOM_CONSTANT) / RANDOM_CONSTANT - spawnData.spawnRadius()
+            );
+            int radius_multiplier;
+            do {
+                radius_multiplier = random.nextInt(spawnData.spawnRadius() * RANDOM_CONSTANT);
+            } while (radius_multiplier <= spawnData.minSpawnRadius() * RANDOM_CONSTANT);
+            vector.normalize().multiply(radius_multiplier / RANDOM_CONSTANT);
+            spawnLocation = world.getSpawnLocation().add(vector);
+            tries++;
+        } while (raidsData.spawnData().cancelledBiomes().contains(world.getBiome(spawnLocation)));
 
         // Spawn and register entities
         for (EntityBuilder entityBuilder : raidsData.raidEntities()) {

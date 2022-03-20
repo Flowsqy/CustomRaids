@@ -16,6 +16,10 @@ event:
     alias: <world-alias>
     radius: <world-radius>
     min-radius: <world-min-radius>
+    cancelled-biomes:
+      - <cancelled-biome-1>
+      - <cancelled-biome-2>
+      - ...
   entities:
     <entity-1>: <entity>
     <entity-2>: <entity>
@@ -51,6 +55,8 @@ event:
 #   Its center is the world spawn. Every position contained in this circle is valid and chosen randomly.
 # <world-min-radius> [integer] : The radius of the circle where the event can not take place.
 #   Its center is the world spawn.
+# <cancelled-biome-n> [https://hub.spigotmc.org/javadocs/spigot/org/bukkit/block/Biome.html] :
+#   A biome where the event can't start. You can have as many cancelled biome as you want.
 #
 # Entities:
 # <entity-n> : The key of an entity. You can have as many entities as you want. The key just need to be unique.

@@ -15,14 +15,12 @@ import fr.flowsqy.customraids.feature.TopKillFeature;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.ChatMessageType;
 import org.bukkit.Bukkit;
+import org.bukkit.block.Biome;
 import org.bukkit.boss.BarColor;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.plugin.Plugin;
 
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.logging.Logger;
 
 public class RaidsDeserializer implements EventDeserializer {
@@ -61,26 +59,9 @@ public class RaidsDeserializer implements EventDeserializer {
         // Get AbstractMob instance
         final Plugin rawAbstractMobPlugin = Bukkit.getPluginManager().getPlugin("AbstractMob");
         if (rawAbstractMobPlugin instanceof AbstractMobPlugin abstractMobPlugin) {
-            // World
-            final ConfigurationSection worldSection = section.getConfigurationSection("world");
-            if (worldSection == null) {
-                logger.warning("Null world section in " + fileName);
-                return null;
-            }
-            final String worldName = worldSection.getString("name");
-            if (worldName == null || worldName.isBlank()) {
-                logger.warning("Empty world name in " + fileName);
-                return null;
-            }
-            final String worldAlias = getMessage(worldSection, "alias");
-            final int spawnRadius = worldSection.getInt("radius", -1);
-            if (spawnRadius < 0) {
-                logger.warning("Invalid radius (< 0) in " + fileName);
-                return null;
-            }
-            final int minSpawnRadius = Math.max(worldSection.getInt("min-radius", 0), 0);
-            if (minSpawnRadius >= spawnRadius) {
-                logger.warning("Invalid min radius, it is greater than the radius");
+            // Spawn
+            final SpawnData spawnData = deserializeSpawn(section, logger, fileName);
+            if (spawnData == null) {
                 return null;
             }
 
@@ -154,12 +135,7 @@ public class RaidsDeserializer implements EventDeserializer {
                     eventData,
                     new RaidsData(
                             abstractMobPlugin,
-                            new SpawnData(
-                                    worldName,
-                                    worldAlias,
-                                    spawnRadius,
-                                    minSpawnRadius
-                            ),
+                            spawnData,
                             raidEntities,
                             featuresData,
                             rewards,
@@ -177,7 +153,54 @@ public class RaidsDeserializer implements EventDeserializer {
     }
 
     /**
-     * Deserialize a {@link fr.flowsqy.customraids.feature.Feature}
+     * Deserialize the {@link SpawnData}
+     *
+     * @return The {@link SpawnData} described by the given {@link org.bukkit.configuration.Configuration}
+     * {@code null} if it can be deserialized
+     */
+    private SpawnData deserializeSpawn(ConfigurationSection section, Logger logger, String fileName) {
+        final ConfigurationSection worldSection = section.getConfigurationSection("world");
+        if (worldSection == null) {
+            logger.warning("Null world section in " + fileName);
+            return null;
+        }
+        final String worldName = worldSection.getString("name");
+        if (worldName == null || worldName.isBlank()) {
+            logger.warning("Empty world name in " + fileName);
+            return null;
+        }
+        final String worldAlias = getMessage(worldSection, "alias");
+        final int spawnRadius = worldSection.getInt("radius", -1);
+        if (spawnRadius < 0) {
+            logger.warning("Invalid radius (< 0) in " + fileName);
+            return null;
+        }
+        final int minSpawnRadius = Math.max(worldSection.getInt("min-radius", 0), 0);
+        if (minSpawnRadius >= spawnRadius) {
+            logger.warning("Invalid min radius, it is greater than the radius");
+            return null;
+        }
+
+        final List<String> rawCancelledBiomes = worldSection.getStringList("cancelled-biomes");
+        final Set<Biome> cancelledBiomes = new HashSet<>();
+        for (String cancelledBiome : rawCancelledBiomes) {
+            final Biome biome = getEnumConstant(Biome.class, cancelledBiome, null);
+            if (biome != null) {
+                cancelledBiomes.add(biome);
+            }
+        }
+
+        return new SpawnData(
+                worldName,
+                worldAlias,
+                spawnRadius,
+                minSpawnRadius,
+                cancelledBiomes
+        );
+    }
+
+    /**
+     * Deserialize all {@link fr.flowsqy.customraids.feature.Feature}
      *
      * @param featuresSection The {@link ConfigurationSection} that contains every feature
      * @return The {@link FeaturesData} described by the given {@link ConfigurationSection}

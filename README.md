@@ -38,6 +38,10 @@ event:
       permanent:
         message: <topkill-permanent-message>
         radius: <topkill-permanent-radius>
+    timer:
+      enable: <timer-enable>
+      timer: <timer-value>
+      message: <timer-message>
   rewards:
     <item-1>: <item>
     <item-2>: <item>
@@ -91,6 +95,14 @@ event:
 #   Keep it empty to disable it. It supports colors
 # <topkill-permanent-radius> [integer] : The radius for the permanent message.
 #   See the <topkill-radius> property for more details.
+#
+# Timer:
+# <timer-enable> [boolean] : Whether the timer should be used
+# <timer-value> [integer] : The time in second before the raid end
+# <timer-message> [String] : The message to send to every player when the timer is out
+#   Keep it empty to disable it. It supports colors.
+#   %x% and %z% will be replaced with the x and y coordinates of the event.
+#   %world% will be replaced with the world name given above.
 #
 # Rewards:
 # <item-n> : The key of a reward. You can have as many entities as you want. The key just need to be unique.

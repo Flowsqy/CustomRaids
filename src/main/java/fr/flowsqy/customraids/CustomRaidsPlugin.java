@@ -36,8 +36,7 @@ public class CustomRaidsPlugin extends JavaPlugin {
     @Override
     public void onDisable() {
         for (RaidsEvent event : raidsEvents) {
-            event.killPreviousEntities();
-            event.unloadFeatures();
+            event.forceEnd();
         }
     }
 

@@ -8,6 +8,7 @@ import fr.flowsqy.customraids.data.FeaturesData;
 import fr.flowsqy.customraids.data.RaidsData;
 import fr.flowsqy.customraids.data.SpawnData;
 import fr.flowsqy.customraids.feature.ProgressionFeature;
+import fr.flowsqy.customraids.feature.TimerFeature;
 import fr.flowsqy.customraids.feature.TopKillFeature;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -58,8 +59,7 @@ public class RaidsEvent implements Event, Listener {
     @Override
     public void perform() {
         // End previous event
-        killPreviousEntities();
-        unloadFeatures();
+        forceEnd();
 
         // Start the new one
         final SpawnData spawnData = raidsData.spawnData();
@@ -126,6 +126,12 @@ public class RaidsEvent implements Event, Listener {
                     spawnLocation.getBlockX(),
                     spawnLocation.getBlockZ()
             );
+        }
+
+        // Load timer
+        final TimerFeature timerFeature = featuresData.timer();
+        if (timerFeature.isEnable()) {
+            timerFeature.load(this);
         }
 
         // Send start message
@@ -251,6 +257,24 @@ public class RaidsEvent implements Event, Listener {
         if (topKillFeature.isEnable()) {
             topKillFeature.unload();
         }
+
+        // Unload the timer feature
+        final TimerFeature timerFeature = featuresData.timer();
+        if (timerFeature.isEnable()) {
+            timerFeature.unload();
+        }
+    }
+
+    /**
+     * Force the raid to end silently
+     */
+    public void forceEnd() {
+        if (!started) {
+            return;
+        }
+        killPreviousEntities();
+        unloadFeatures();
+        started = false;
     }
 
     /**
@@ -289,7 +313,7 @@ public class RaidsEvent implements Event, Listener {
      *
      * @param rawMessage The message with placeholders
      */
-    private void sendMessage(String rawMessage) {
+    public void sendMessage(String rawMessage) {
         if (rawMessage != null) {
             final String message = rawMessage
                     .replace("%world%", raidsData.spawnData().worldAlias())

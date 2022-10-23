@@ -11,6 +11,7 @@ import fr.flowsqy.customraids.data.FeaturesData;
 import fr.flowsqy.customraids.data.RaidsData;
 import fr.flowsqy.customraids.data.SpawnData;
 import fr.flowsqy.customraids.feature.ProgressionFeature;
+import fr.flowsqy.customraids.feature.TimerFeature;
 import fr.flowsqy.customraids.feature.TopKillFeature;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.ChatMessageType;
@@ -119,7 +120,7 @@ public class RaidsDeserializer implements EventDeserializer {
             if (featuresSection != null) {
                 featuresData = deserializeFeatures(featuresSection);
             } else {
-                featuresData = new FeaturesData(ProgressionFeature.NULL, TopKillFeature.NULL);
+                featuresData = new FeaturesData(ProgressionFeature.NULL, TopKillFeature.NULL, TimerFeature.NULL);
             }
 
             // Messages
@@ -210,13 +211,12 @@ public class RaidsDeserializer implements EventDeserializer {
         final ConfigurationSection barSection = featuresSection.getConfigurationSection("progression-bar");
         final ProgressionFeature progressionFeature;
         if (barSection != null && barSection.getBoolean("enable")) {
-            final String title = barSection.getString("title");
             progressionFeature = new ProgressionFeature(
                     true,
                     customRaidsPlugin,
                     barSection.getInt("radius", -1),
                     getEnumConstant(BarColor.class, barSection.getString("color"), BarColor.RED),
-                    title == null ? null : ChatColor.translateAlternateColorCodes('&', title)
+                    getMessage(barSection, "title")
             );
         } else {
             progressionFeature = ProgressionFeature.NULL;
@@ -226,24 +226,40 @@ public class RaidsDeserializer implements EventDeserializer {
         final ConfigurationSection topKillSection = featuresSection.getConfigurationSection("top-kill");
         final TopKillFeature topKillFeature;
         if (topKillSection != null && topKillSection.getBoolean("enable")) {
-            final String message = topKillSection.getString("message");
-            final String permanentMessage = topKillSection.getString("permanent.message");
             topKillFeature = new TopKillFeature(
                     true,
                     customRaidsPlugin,
                     topKillSection.getInt("radius", -1),
-                    message == null ? null : ChatColor.translateAlternateColorCodes('&', message),
+                    getMessage(topKillSection, "message"),
                     getEnumConstant(ChatMessageType.class, topKillSection.getString("type"), ChatMessageType.CHAT),
-                    permanentMessage == null ? null : ChatColor.translateAlternateColorCodes('&', permanentMessage),
+                    getMessage(topKillSection, "permanent.message"),
                     topKillSection.getInt("permanent.radius")
             );
         } else {
             topKillFeature = TopKillFeature.NULL;
         }
 
+        // TimerFeature
+        final ConfigurationSection timerSection = featuresSection.getConfigurationSection("timer");
+        final TimerFeature timerFeature;
+        long timer;
+        if (timerSection != null && timerSection.getBoolean("enable")
+                && (timer = timerSection.getLong("timer", -1)) > 0
+        ) {
+            timerFeature = new TimerFeature(
+                    true,
+                    customRaidsPlugin,
+                    timer,
+                    getMessage(timerSection, "message")
+            );
+        } else {
+            timerFeature = TimerFeature.NULL;
+        }
+
         return new FeaturesData(
                 progressionFeature,
-                topKillFeature
+                topKillFeature,
+                timerFeature
         );
     }
 

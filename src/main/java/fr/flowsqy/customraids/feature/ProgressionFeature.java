@@ -21,7 +21,7 @@ public class ProgressionFeature extends ZonedFeature implements Listener {
     private final BarColor color;
     private final String title;
     private boolean loaded;
-    private int maxEntity;
+    private int maxEntity, xCenter, zCenter;
     private BukkitTask task;
     private BossBar bossBar;
 
@@ -53,6 +53,8 @@ public class ProgressionFeature extends ZonedFeature implements Listener {
                 20L
         );
         this.maxEntity = maxEntity;
+        this.xCenter = xCenter;
+        this.zCenter = zCenter;
         formatTitle(maxEntity);
         loaded = true;
     }
@@ -128,6 +130,8 @@ public class ProgressionFeature extends ZonedFeature implements Listener {
             // Get the new title
             final double proportion = (double) remainingEntity / maxEntity;
             final String formattedTitle = title
+                    .replace("%x%", String.valueOf(xCenter))
+                    .replace("%z%", String.valueOf(zCenter))
                     .replace("%max_entities%", String.valueOf(maxEntity))
                     .replace("%entities%", String.valueOf(remainingEntity))
                     .replace("%proportion%", String.valueOf(proportion))

@@ -88,7 +88,7 @@ public class RaidsDeserializer implements EventDeserializer {
                 if (entitySection == null) {
                     continue;
                 }
-                final EntityBuilder builder = EntityBuilderSerializer.deserialize(abstractMobPlugin, entitySection);
+                final EntityBuilder builder = EntityBuilderSerializer.deserialize(abstractMobPlugin, entitySection, logger);
                 if (builder != null) {
                     raidEntities.add(builder);
                 }

@@ -42,7 +42,7 @@
         <dependency>
             <groupId>com.github.Flowsqy</groupId>
             <artifactId>AbstractMob</artifactId>
-            <version>2e90a587d4</version>
+            <version>2a3b6d2820</version>
             <scope>provided</scope>
         </dependency>
         <dependency>

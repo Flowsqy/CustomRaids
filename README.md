@@ -144,19 +144,19 @@ event:
     min-radius: 20
   entities:
     1:
-      type: ZOMBIE
+      type: zombie
       quantity: 5
       radius: 4
       living:
         keep-when-far-away: true
     2:
-      type: SKELETON
+      type: skeleton
       quantity: 2
       radius: 4
       living:
         keep-when-far-away: true
     3:
-      type: CREEPER
+      type: creeper
       quantity: 1
       radius: 4
       living:

@@ -193,10 +193,17 @@ public class RaidsDeserializer implements EventDeserializer {
         final List<String> rawCancelledBiomes = worldSection.getStringList("cancelled-biomes");
         final Set<Biome> cancelledBiomes = new HashSet<>();
         for (String cancelledBiome : rawCancelledBiomes) {
-            final Biome biome = Registry.BIOME.get(NamespacedKey.minecraft(cancelledBiome));
-            if (biome != null) {
-                cancelledBiomes.add(biome);
+            final NamespacedKey biomeKey = NamespacedKey.fromString(cancelledBiome);
+            if (biomeKey == null) {
+                logger.warning("'" + cancelledBiome + "' is not a valid ressource location");
+                continue;
             }
+            final Biome biome = Registry.BIOME.get(biomeKey);
+            if (biome == null) {
+                logger.warning("'" + biomeKey + "' is not a valid biome");
+                continue;
+            }
+            cancelledBiomes.add(biome);
         }
 
         return new SpawnData(

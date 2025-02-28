@@ -1,9 +1,10 @@
 package fr.flowsqy.customraids.feature;
 
-import fr.flowsqy.customraids.CustomRaidsPlugin;
-import net.md_5.bungee.api.ChatMessageType;
-import net.md_5.bungee.api.chat.BaseComponent;
-import net.md_5.bungee.api.chat.TextComponent;
+import java.util.Map;
+import java.util.Objects;
+import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
+
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.World;
@@ -13,10 +14,10 @@ import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
 import org.bukkit.scheduler.BukkitTask;
 
-import java.util.Map;
-import java.util.Objects;
-import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
+import fr.flowsqy.customraids.CustomRaidsPlugin;
+import net.md_5.bungee.api.ChatMessageType;
+import net.md_5.bungee.api.chat.BaseComponent;
+import net.md_5.bungee.api.chat.TextComponent;
 
 public class TopKillFeature extends ZonedFeature implements Listener {
 
@@ -27,8 +28,7 @@ public class TopKillFeature extends ZonedFeature implements Listener {
             null,
             null,
             null,
-            0
-    );
+            0);
 
     private final CustomRaidsPlugin plugin;
     private final String message;
@@ -47,8 +47,7 @@ public class TopKillFeature extends ZonedFeature implements Listener {
             String message,
             ChatMessageType messageType,
             String permanentMessage,
-            int permanentRadius
-    ) {
+            int permanentRadius) {
         super(enable, radius);
         this.plugin = plugin;
         this.message = message;
@@ -92,8 +91,7 @@ public class TopKillFeature extends ZonedFeature implements Listener {
                         world, xCenter, zCenter,
                         ChatMessageType.ACTION_BAR,
                         permanentMessage,
-                        permanentRadius
-                );
+                        permanentRadius);
             };
             task = Bukkit.getScheduler().runTaskTimerAsynchronously(plugin, taskRunnable, 0L, 40L);
             // 40L Is the maximum amount of ticks before the message start to shade itself
@@ -148,7 +146,8 @@ public class TopKillFeature extends ZonedFeature implements Listener {
     }
 
     /**
-     * Get the {@link java.util.Map.Entry} of the top killer of the current {@link fr.flowsqy.customraids.RaidsEvent}
+     * Get the {@link java.util.Map.Entry} of the top killer of the current
+     * {@link fr.flowsqy.customraids.RaidsEvent}
      *
      * @return The {@link java.util.Map.Entry} of the current top killer
      */
@@ -166,8 +165,10 @@ public class TopKillFeature extends ZonedFeature implements Listener {
      * Send the top kill message if needed
      *
      * @param world   The {@link World} where the event is
-     * @param xCenter The x coordinate of the location where the {@link fr.flowsqy.customraids.RaidsEvent} take place
-     * @param zCenter The z coordinate of the location where the {@link fr.flowsqy.customraids.RaidsEvent} take place
+     * @param xCenter The x coordinate of the location where the
+     *                {@link fr.flowsqy.customraids.RaidsEvent} take place
+     * @param zCenter The z coordinate of the location where the
+     *                {@link fr.flowsqy.customraids.RaidsEvent} take place
      */
     public void sendMessage(World world, int xCenter, int zCenter) {
         // Nothing to do if the message is null
@@ -175,7 +176,8 @@ public class TopKillFeature extends ZonedFeature implements Listener {
             return;
         }
 
-        // Get the top killer before async task because the feature is unloaded before the async task is performed
+        // Get the top killer before async task because the feature is unloaded before
+        // the async task is performed
         final Map.Entry<UUID, Integer> topKillEntry = getTopKiller();
         if (topKillEntry == null) {
             return;
@@ -188,18 +190,19 @@ public class TopKillFeature extends ZonedFeature implements Listener {
                         world, xCenter, zCenter,
                         messageType,
                         message,
-                        radius
-                )
-        );
+                        radius));
     }
 
     /**
      * Send the top kill action bar message
      *
-     * @param topKillEntry The {@link java.util.Map.Entry} with the top killer {@link UUID} and kill count
+     * @param topKillEntry The {@link java.util.Map.Entry} with the top killer
+     *                     {@link UUID} and kill count
      * @param world        The {@link World} where the event is
-     * @param xCenter      The x coordinate of the location where the {@link fr.flowsqy.customraids.RaidsEvent} take place
-     * @param zCenter      The z coordinate of the location where the {@link fr.flowsqy.customraids.RaidsEvent} take place
+     * @param xCenter      The x coordinate of the location where the
+     *                     {@link fr.flowsqy.customraids.RaidsEvent} take place
+     * @param zCenter      The z coordinate of the location where the
+     *                     {@link fr.flowsqy.customraids.RaidsEvent} take place
      * @param messageType  The {@link ChatMessageType} type of the message to send
      * @param message      The message to send
      * @param radius       The radius to use
@@ -211,16 +214,14 @@ public class TopKillFeature extends ZonedFeature implements Listener {
             int zCenter,
             ChatMessageType messageType,
             String message,
-            int radius
-    ) {
+            int radius) {
         final OfflinePlayer topKiller = Bukkit.getOfflinePlayer(topKillEntry.getKey());
         final String playerName = topKiller.getName();
         Objects.requireNonNull(playerName, "The name of the top killer is null");
 
-        final BaseComponent[] messageComponent = TextComponent.fromLegacyText(message
+        final BaseComponent messageComponent = TextComponent.fromLegacy(message
                 .replace("%count%", String.valueOf(topKillEntry.getValue()))
-                .replace("%player%", playerName)
-        );
+                .replace("%player%", playerName));
         for (Player player : calculateViewers(world, xCenter, zCenter, radius)) {
             player.spigot().sendMessage(messageType, messageComponent);
         }

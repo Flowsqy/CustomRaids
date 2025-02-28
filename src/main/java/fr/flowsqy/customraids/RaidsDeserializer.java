@@ -1,5 +1,21 @@
 package fr.flowsqy.customraids;
 
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.logging.Logger;
+
+import org.bukkit.Bukkit;
+import org.bukkit.NamespacedKey;
+import org.bukkit.Registry;
+import org.bukkit.block.Biome;
+import org.bukkit.boss.BarColor;
+import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.plugin.Plugin;
+
 import fr.flowsqy.abstractmenu.item.ItemBuilder;
 import fr.flowsqy.abstractmob.AbstractMobPlugin;
 import fr.flowsqy.abstractmob.entity.EntityBuilder;
@@ -15,14 +31,6 @@ import fr.flowsqy.customraids.feature.TimerFeature;
 import fr.flowsqy.customraids.feature.TopKillFeature;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.ChatMessageType;
-import org.bukkit.Bukkit;
-import org.bukkit.block.Biome;
-import org.bukkit.boss.BarColor;
-import org.bukkit.configuration.ConfigurationSection;
-import org.bukkit.plugin.Plugin;
-
-import java.util.*;
-import java.util.logging.Logger;
 
 public class RaidsDeserializer implements EventDeserializer {
 
@@ -39,9 +47,11 @@ public class RaidsDeserializer implements EventDeserializer {
      *
      * @param enumClass    The enum class
      * @param constantName The name of the enum constant
-     * @param defaultValue The default value that will be returned if there is no constant matching the given name
+     * @param defaultValue The default value that will be returned if there is no
+     *                     constant matching the given name
      * @param <T>          The enum type
-     * @return The found enum constant or the default value if there is constant matching the given name
+     * @return The found enum constant or the default value if there is constant
+     *         matching the given name
      */
     private static <T extends Enum<T>> T getEnumConstant(Class<T> enumClass, String constantName, T defaultValue) {
         if (constantName == null) {
@@ -87,7 +97,6 @@ public class RaidsDeserializer implements EventDeserializer {
                 logger.warning("No entity for the raids in " + fileName);
                 return null;
             }
-
 
             // Rewards
             final Map<ItemBuilder, List<Integer>> rewards = new HashMap<>();
@@ -141,9 +150,7 @@ public class RaidsDeserializer implements EventDeserializer {
                             featuresData,
                             rewards,
                             startMessage,
-                            endMessage
-                    )
-            );
+                            endMessage));
             Bukkit.getPluginManager().registerEvents(event, customRaidsPlugin);
             raidsEvents.add(event);
             return event;
@@ -156,8 +163,9 @@ public class RaidsDeserializer implements EventDeserializer {
     /**
      * Deserialize the {@link SpawnData}
      *
-     * @return The {@link SpawnData} described by the given {@link org.bukkit.configuration.Configuration}
-     * {@code null} if it can be deserialized
+     * @return The {@link SpawnData} described by the given
+     *         {@link org.bukkit.configuration.Configuration}
+     *         {@code null} if it can be deserialized
      */
     private SpawnData deserializeSpawn(ConfigurationSection section, Logger logger, String fileName) {
         final ConfigurationSection worldSection = section.getConfigurationSection("world");
@@ -185,7 +193,7 @@ public class RaidsDeserializer implements EventDeserializer {
         final List<String> rawCancelledBiomes = worldSection.getStringList("cancelled-biomes");
         final Set<Biome> cancelledBiomes = new HashSet<>();
         for (String cancelledBiome : rawCancelledBiomes) {
-            final Biome biome = getEnumConstant(Biome.class, cancelledBiome, null);
+            final Biome biome = Registry.BIOME.get(NamespacedKey.minecraft(cancelledBiome));
             if (biome != null) {
                 cancelledBiomes.add(biome);
             }
@@ -196,15 +204,16 @@ public class RaidsDeserializer implements EventDeserializer {
                 worldAlias,
                 spawnRadius,
                 minSpawnRadius,
-                cancelledBiomes
-        );
+                cancelledBiomes);
     }
 
     /**
      * Deserialize all {@link fr.flowsqy.customraids.feature.Feature}
      *
-     * @param featuresSection The {@link ConfigurationSection} that contains every feature
-     * @return The {@link FeaturesData} described by the given {@link ConfigurationSection}
+     * @param featuresSection The {@link ConfigurationSection} that contains every
+     *                        feature
+     * @return The {@link FeaturesData} described by the given
+     *         {@link ConfigurationSection}
      */
     private FeaturesData deserializeFeatures(ConfigurationSection featuresSection) {
         // ProgressionBar
@@ -216,8 +225,7 @@ public class RaidsDeserializer implements EventDeserializer {
                     customRaidsPlugin,
                     barSection.getInt("radius", -1),
                     getEnumConstant(BarColor.class, barSection.getString("color"), BarColor.RED),
-                    getMessage(barSection, "title")
-            );
+                    getMessage(barSection, "title"));
         } else {
             progressionFeature = ProgressionFeature.NULL;
         }
@@ -233,8 +241,7 @@ public class RaidsDeserializer implements EventDeserializer {
                     getMessage(topKillSection, "message"),
                     getEnumConstant(ChatMessageType.class, topKillSection.getString("type"), ChatMessageType.CHAT),
                     getMessage(topKillSection, "permanent.message"),
-                    topKillSection.getInt("permanent.radius")
-            );
+                    topKillSection.getInt("permanent.radius"));
         } else {
             topKillFeature = TopKillFeature.NULL;
         }
@@ -244,14 +251,12 @@ public class RaidsDeserializer implements EventDeserializer {
         final TimerFeature timerFeature;
         long timer;
         if (timerSection != null && timerSection.getBoolean("enable")
-                && (timer = timerSection.getLong("timer", -1)) > 0
-        ) {
+                && (timer = timerSection.getLong("timer", -1)) > 0) {
             timerFeature = new TimerFeature(
                     true,
                     customRaidsPlugin,
                     timer,
-                    getMessage(timerSection, "message")
-            );
+                    getMessage(timerSection, "message"));
         } else {
             timerFeature = TimerFeature.NULL;
         }
@@ -259,8 +264,7 @@ public class RaidsDeserializer implements EventDeserializer {
         return new FeaturesData(
                 progressionFeature,
                 topKillFeature,
-                timerFeature
-        );
+                timerFeature);
     }
 
     /**
@@ -268,7 +272,8 @@ public class RaidsDeserializer implements EventDeserializer {
      *
      * @param messageSection The message section
      * @param path           The path of the message
-     * @return the message stored in the configuration with colors, null if it does not exist
+     * @return the message stored in the configuration with colors, null if it does
+     *         not exist
      */
     private String getMessage(ConfigurationSection messageSection, String path) {
         final String message = messageSection.getString(path);

@@ -59,7 +59,7 @@ event:
 #   Its center is the world spawn. Every position contained in this circle is valid and chosen randomly.
 # <world-min-radius> [integer] : The radius of the circle where the event can not take place.
 #   Its center is the world spawn.
-# <cancelled-biome-n> [https://hub.spigotmc.org/javadocs/spigot/org/bukkit/block/Biome.html] :
+# <cancelled-biome-n> [https://minecraft.wiki/w/Biome#Java_Edition] :
 #   A biome where the event can't start. You can have as many cancelled biome as you want.
 #
 # Entities:
@@ -178,3 +178,4 @@ event:
 ## Building
 
 Just clone the repository and do `mvn clean install` or `mvn clean package`. The jar is in the _target_ directory.
+
